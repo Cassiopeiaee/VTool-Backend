@@ -1,11 +1,10 @@
 package com.VTool;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/smenso")
 public class SmensoApiController {
 
     private final SmensoApiService smensoApiService;
@@ -14,8 +13,8 @@ public class SmensoApiController {
         this.smensoApiService = smensoApiService;
     }
 
-    @PostMapping(value = "/smenso/project", consumes = MediaType.APPLICATION_XML_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public String createProject(@RequestBody ProjectRequest projectRequest) {
-        return smensoApiService.createProject(projectRequest);
+    @PostMapping(value = "/project", consumes = MediaType.APPLICATION_XML_VALUE)
+    public String createOrUpdateProject(@RequestBody String xmlPayload) {
+        return smensoApiService.createOrUpdateProject(xmlPayload);
     }
 }
