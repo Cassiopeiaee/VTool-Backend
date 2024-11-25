@@ -16,10 +16,10 @@ public class SmensoApiService {
         this.restTemplate = restTemplate;
     }
 
-    public String createOrUpdateProject(String xmlPayload) {
+    public String createProjectWithTemplate(String templateId, String xmlPayload) {
         try {
-            // Endpunkt mit festem Workspace-Namen
-            String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Integration/project";
+            // Endpunkt mit Template-ID
+            String apiUrl = String.format("https://bgn-it.smenso.cloud/skyisland/api/Integration/template/project/create/fd8730f2-fd75-41e8-be8d-fd502a4df113", templateId);
 
             // Header konfigurieren
             HttpHeaders headers = new HttpHeaders();
