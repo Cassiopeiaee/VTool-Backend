@@ -1,5 +1,6 @@
 package com.VTool;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,6 +36,27 @@ public class SmensoApiService {
             return response.getBody();
         } catch (Exception e) {
             throw new RuntimeException("Fehler bei der Anfrage: " + e.getMessage(), e);
+        }
+    }
+
+    public String getProjectById(String projectId) {
+        try {
+            // Endpunkt mit Projekt-ID
+            String apiUrl = String.format("https://bgn-it.smenso.cloud/skyisland/api/Integration/project/465f3870-0c2d-408b-aba7-896fcf07cd81", projectId);
+
+            // Header konfigurieren
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
+
+            // Anfrage erstellen
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+            // API-Aufruf
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
+
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Fehler beim Abrufen des Projekts: " + e.getMessage(), e);
         }
     }
 }

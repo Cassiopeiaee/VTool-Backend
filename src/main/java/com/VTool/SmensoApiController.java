@@ -17,4 +17,9 @@ public class SmensoApiController {
     public String createProjectWithTemplate(@PathVariable String templateId, @RequestBody String xmlPayload) {
         return smensoApiService.createProjectWithTemplate(templateId, xmlPayload);
     }
+
+    @GetMapping("/project/{id}")
+    public String getProjectById(@PathVariable String id) {
+        return smensoApiService.getProjectById(id);
+    }
 }
