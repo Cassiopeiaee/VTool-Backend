@@ -17,10 +17,10 @@ public class SmensoApiService {
         this.restTemplate = restTemplate;
     }
 
-    public String createProjectWithTemplate(String templateId, String xmlPayload) {
+    public String createProject(String xmlPayload) {
         try {
-            // Endpunkt mit Template-ID
-            String apiUrl = String.format("https://bgn-it.smenso.cloud/skyisland/api/Integration/template/project/create/fd8730f2-fd75-41e8-be8d-fd502a4df113", templateId);
+            
+            String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Integration/project";
 
             // Header konfigurieren
             HttpHeaders headers = new HttpHeaders();
@@ -35,14 +35,14 @@ public class SmensoApiService {
 
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Fehler bei der Anfrage: " + e.getMessage(), e);
+            throw new RuntimeException("Fehler beim Erstellen des Projekts: " + e.getMessage(), e);
         }
     }
 
     public String getProjectById(String projectId) {
         try {
-            // Endpunkt mit Projekt-ID
-            String apiUrl = String.format("https://bgn-it.smenso.cloud/skyisland/api/Integration/project/465f3870-0c2d-408b-aba7-896fcf07cd81", projectId);
+            
+            String apiUrl = String.format("https://bgn-it.smenso.cloud/skyisland/api/Integration/project", projectId);
 
             // Header konfigurieren
             HttpHeaders headers = new HttpHeaders();

@@ -13,9 +13,9 @@ public class SmensoApiController {
         this.smensoApiService = smensoApiService;
     }
 
-    @PostMapping(value = "/project/template/{templateId}", consumes = MediaType.APPLICATION_XML_VALUE)
-    public String createProjectWithTemplate(@PathVariable String templateId, @RequestBody String xmlPayload) {
-        return smensoApiService.createProjectWithTemplate(templateId, xmlPayload);
+    @PostMapping(value = "/project", consumes = "application/xml", produces = "application/xml")
+    public String createProject(@RequestBody String xmlPayload) {
+        return smensoApiService.createProject(xmlPayload);
     }
 
     @GetMapping("/project/{id}")
