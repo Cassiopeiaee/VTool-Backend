@@ -1,6 +1,7 @@
 package com.VTool;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,5 +25,15 @@ public class SmensoApiController {
             @RequestParam String filter,
             @RequestParam String format) {
         return smensoApiService.getProjectsReport(viewId, filter, format);
+    }
+
+    @GetMapping("/projects/fetch-and-convert")
+    public ResponseEntity<String> fetchAndConvertCsvToXml() {
+        try {
+            String xmlData = smensoApiService.fetchAndConvertCsvToXml();
+            return ResponseEntity.ok(xmlData);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Fehler: " + e.getMessage());
+        }
     }
 }
