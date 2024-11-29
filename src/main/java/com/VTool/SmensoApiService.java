@@ -25,6 +25,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -183,5 +184,21 @@ public String getProjectsReport(String viewId, String filter, String format) {
         } catch (Exception e) {
             throw new RuntimeException("Generiertes XML ist ungültig: " + e.getMessage(), e);
         }
+    }
+
+
+
+
+
+
+    @GetMapping
+    public ResponseEntity<List<Project>> getProjects() {
+        // Beispielhafte Projektdaten (kann aus der Datenbank kommen)
+        List<Project> projects = List.of(
+            new Project("1", "Testprojekt", "Dies ist ein Testprojekt", "2023-05-01", "2023-06-01"),
+            new Project("2", "Beispielprojekt", "Dies ist ein Beispiel", "2023-07-01", "2023-08-01")
+        );
+
+        return ResponseEntity.ok(projects);
     }
 }
