@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "http:localhost:4200")
 @RequestMapping("/smenso")
 public class SmensoApiController {
 
@@ -35,5 +36,11 @@ public class SmensoApiController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Fehler: " + e.getMessage());
         }
+    }
+
+    @RequestMapping(value = "/**")
+    public String forward() {
+        // Weiterleitung zu Angulars index.html
+        return "forward:/index.html";
     }
 }

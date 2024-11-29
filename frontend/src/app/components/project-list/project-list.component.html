@@ -1,24 +1,12 @@
-<div>
-    <h1>Projektliste</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Titel</th>
-          <th>Beschreibung</th>
-          <th>Startdatum</th>
-          <th>Enddatum</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let project of projects">
-          <td>{{ project.id }}</td>
-          <td>{{ project.title }}</td>
-          <td>{{ project.description }}</td>
-          <td>{{ project.start }}</td>
-          <td>{{ project.end }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
+<table>
+  <thead>
+    <tr>
+      <th *ngFor="let header of tableData[0]">{{ header }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of tableData.slice(1)">
+      <td *ngFor="let cell of row">{{ cell }}</td>
+    </tr>
+  </tbody>
+</table>
