@@ -18,8 +18,11 @@ public class SmensoApiController {
         return smensoApiService.createProject(xmlPayload);
     }
 
-    @GetMapping("/project/{id}")
-    public String getProjectById(@PathVariable String id) {
-        return smensoApiService.getProjectById(id);
+    @GetMapping(value = "/projects/report", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getProjectsReport(
+            @RequestParam String viewId,
+            @RequestParam String filter,
+            @RequestParam String format) {
+        return smensoApiService.getProjectsReport(viewId, filter, format);
     }
 }
