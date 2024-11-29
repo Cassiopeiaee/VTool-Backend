@@ -1,11 +1,7 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
-import { provideRouter } from '@angular/router';
-import { routes } from './app.routes';
+import { ApplicationConfig, provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(), // HTTP Client Configuration
-    provideRouter(routes), // Router Configuration
+    provideHttpClient(withFetch()), // Aktiviert die Fetch-API
   ],
 };

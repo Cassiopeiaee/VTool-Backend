@@ -6,13 +6,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ProjectService {
-  private apiUrl = 'http://localhost:8080/projects/report';
+  private apiUrl = 'http://localhost:8080';
 
   constructor(private http: HttpClient) {}
 
   getProjects(viewId: string, filter: string, format: string): Observable<string> {
-    return this.http.get(`${this.apiUrl}?viewId=${viewId}&filter=${filter}&format=${format}`, {
-      responseType: 'text',
-    });
+    const url = `${this.apiUrl}?viewId=${viewId}&filter=${filter}&format=${format}`;
+    return this.http.get(url, { responseType: 'text' });
   }
 }

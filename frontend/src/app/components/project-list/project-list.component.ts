@@ -1,17 +1,13 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { Component, OnInit } from '@angular/core';
 import { ProjectService } from '../../services/project.service';
 
 @Component({
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
-  standalone: true, // standalone-Komponente
-  imports: [CommonModule], // Füge CommonModule hier hinzu
 })
-export class ProjectListComponent {
+export class ProjectListComponent implements OnInit {
   csvData: string = '';
-  tableData: string[][] = [];
 
   constructor(private projectService: ProjectService) {}
 
@@ -23,7 +19,7 @@ export class ProjectListComponent {
   }
 
   parseCsvData(): void {
-    const lines = this.csvData.split('\n');
-    this.tableData = lines.map((line) => line.split(','));
+    // Füge deine Logik zur CSV-Verarbeitung hinzu
+    console.log(this.csvData);
   }
 }
