@@ -1,25 +1,43 @@
 import { Component, OnInit } from '@angular/core';
-import { ProjectService } from '../../services/project.service';
 
 @Component({
+  standalone: true,
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
 })
 export class ProjectListComponent implements OnInit {
-  csvData: string = '';
-
-  constructor(private projectService: ProjectService) {}
+  projects = [
+    {
+      id: '1',
+      name: 'Projekt Alpha',
+      startDate: '2024-01-01',
+      endDate: '2024-06-01',
+      projectManager: 'Alice Johnson',
+      status: 'In Bearbeitung',
+      workflow: 'Genehmigung',
+    },
+    {
+      id: '2',
+      name: 'Projekt Beta',
+      startDate: '2024-02-01',
+      endDate: '2024-08-01',
+      projectManager: 'Bob Smith',
+      status: 'Abgeschlossen',
+      workflow: 'Überprüfung',
+    },
+    {
+      id: '3',
+      name: 'Projekt Gamma',
+      startDate: '2024-03-01',
+      endDate: '2024-09-01',
+      projectManager: 'Charlie Brown',
+      status: 'Geplant',
+      workflow: 'Genehmigung',
+    },
+  ]; // Beispiel-Daten
 
   ngOnInit(): void {
-    this.projectService.getProjects('e813c779-f5ed-4fce-91ca-1ec9f67b0262', 'active', 'CSV').subscribe((data) => {
-      this.csvData = data;
-      this.parseCsvData();
-    });
-  }
-
-  parseCsvData(): void {
-    // Füge deine Logik zur CSV-Verarbeitung hinzu
-    console.log(this.csvData);
+    // Hier kannst du später Daten aus einer API laden
   }
 }

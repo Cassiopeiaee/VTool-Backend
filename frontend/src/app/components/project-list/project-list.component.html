@@ -1,12 +1,19 @@
-<table>
-  <thead>
-    <tr>
-      <th *ngFor="let header of tableData[0]">{{ header }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let row of tableData.slice(1)">
-      <td *ngFor="let cell of row">{{ cell }}</td>
-    </tr>
-  </tbody>
-</table>
+<div style="text-align: center;">
+  <h2>Projektliste</h2>
+  <table border="1" style="width: 100%; text-align: left;">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Projektname</th>
+        <th>Startdatum</th>
+        <th>Enddatum</th>
+        <th>Project Manager</th>
+        <th>Status</th>
+        <th>Workflow</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Leerer Platzhalter für spätere Daten -->
+    </tbody>
+  </table>
+</div>
