@@ -6,12 +6,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ProjectService {
-  private apiUrl = 'http://localhost:8080';
+  private apiUrl = 'http://localhost:8080/api/projects/report/json';
 
   constructor(private http: HttpClient) {}
 
-  getProjects(viewId: string, filter: string, format: string): Observable<string> {
+  getProjects(viewId: string, filter: string, format: string = 'CSV'): Observable<any[]> {
     const url = `${this.apiUrl}?viewId=${viewId}&filter=${filter}&format=${format}`;
-    return this.http.get(url, { responseType: 'text' });
+    return this.http.get<any[]>(url);
   }
 }

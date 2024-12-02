@@ -1,23 +1,18 @@
 package com.VTool;
 
 import org.springframework.http.HttpMethod;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -59,6 +54,38 @@ public class SmensoApiService {
             throw new RuntimeException("Fehler beim Erstellen des Projekts: " + e.getMessage(), e);
         }
     }
+
+
+    public List<Map<String, String>> getProjectsReportAsJson(String csvData) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(csvData))) {
+            String headerLine = reader.readLine(); // Erste Zeile enthält Header
+
+            if (headerLine == null || headerLine.isEmpty()) {
+                throw new RuntimeException("CSV-Daten enthalten keine Header");
+            }
+
+            String[] headers = headerLine.split(","); // Header in Felder aufteilen
+            List<Map<String, String>> jsonData = new ArrayList<>();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",", -1); // Datenzeile in Felder aufteilen
+                Map<String, String> row = new HashMap<>();
+
+                for (int i = 0; i < headers.length; i++) {
+                    row.put(headers[i].trim(), i < values.length ? values[i].trim() : ""); // Fehlende Werte behandeln
+                }
+                jsonData.add(row);
+            }
+
+            return jsonData;
+        } catch (Exception e) {
+            throw new RuntimeException("Fehler beim Verarbeiten der CSV-Daten", e);
+        }
+    }
+
+
+
 
 public String getProjectsReport(String viewId, String filter, String format) {
         try {
