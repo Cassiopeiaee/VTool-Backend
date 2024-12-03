@@ -1,57 +1,28 @@
 <div style="text-align: center;">
   <h1>Projektliste</h1>
-  <table border="1" style="width: 100%; text-align: left;">
+
+  <button (click)="openDialog()">Projekt hinzufügen</button>
+
+  <table>
     <thead>
       <tr>
-        <th>Projekt-ID</th>
-        <th>Projektname</th>
-        <th>Startdatum</th>
-        <th>Enddatum</th>
-        <th>Status</th>
+        <th *ngFor="let key of projects[0] | keyvalue">{{ key.key }}</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let project of projects">
-        <td>{{ project['Projekt-ID'] }}</td>
-        <td>{{ project['Projektname'] }}</td>
-        <td>{{ project['Startdatum'] }}</td>
-        <td>{{ project['Enddatum'] }}</td>
-        <td>{{ project['Status'] }}</td>
+        <td *ngFor="let key of getKeys(project)">{{ project[key] }}</td>
       </tr>
     </tbody>
-  </table>
+  </table>  
+</div>
 
-  <!-- Button unten rechts -->
-  <button
-    style="position: fixed; bottom: 20px; right: 20px;"
-    (click)="openDialog()"
-  >
-    Projekt hinzufügen
-  </button>
-
-  <!-- Dialog -->
-  <div
-    *ngIf="dialogOpen"
-    style="
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    "
-  >
-    <h3>Projekt hinzufügen</h3>
-    <label for="viewId">View-ID:</label>
-    <input
-      id="viewId"
-      type="text"
-      [(ngModel)]="viewId"
-      placeholder="Geben Sie die View-ID ein"
-    />
-    <br />
-    <button (click)="fetchProject()">Bestätigen</button>
-    <button (click)="closeDialog()">Abbrechen</button>
-  </div>
+<div *ngIf="dialogOpen" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid black;">
+  <h2>Projekt hinzufügen</h2>
+  <label>
+    View-ID:
+    <input type="text" [(ngModel)]="viewId" />
+  </label>
+  <button (click)="fetchProject()">Bestätigen</button>
+  <button (click)="closeDialog()">Abbrechen</button>
 </div>

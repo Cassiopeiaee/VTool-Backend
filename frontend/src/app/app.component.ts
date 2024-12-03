@@ -4,13 +4,7 @@ import { ProjectListComponent } from './components/project-list/project-list.com
 @Component({
   standalone: true,
   selector: 'app-root',
-  template: `
-    <h1>{{ title }}</h1>
-    <app-project-list></app-project-list>
-  `,
-  styleUrls: ['./app.component.css'],
-  imports: [ProjectListComponent], // Importiere die Standalone-Komponente
+  template: `<app-project-list></app-project-list>`, // Einbinden der ProjectListComponent
+  imports: [ProjectListComponent], // Import der Standalone-Komponente
 })
-export class AppComponent {
-  title = 'Projektliste'; // Titel-Eigenschaft hinzugefügt
-}
+export class AppComponent {}

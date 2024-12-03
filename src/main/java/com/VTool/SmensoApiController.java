@@ -10,8 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+@CrossOrigin(
+        origins = "http://localhost:4200",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS},
+        allowedHeaders = {"Authorization", "Content-Type", "Accept"},
+        allowCredentials = "true")
+
+
 @RestController
-@CrossOrigin(origins = "http://localhost:4200") // Fehlerhafter Pfad "http:localhost" korrigiert
 @RequestMapping("/smenso")
 public class SmensoApiController {
 
@@ -22,6 +28,46 @@ public class SmensoApiController {
         this.smensoApiService = smensoApiService;
         this.projectReportService = projectReportService;
     }
+
+
+    @GetMapping("/fetch")
+    public ResponseEntity<List<Map<String, String>>> fetchProjectData(
+            @RequestParam String guid,
+            @RequestParam(defaultValue = "active") String filter,
+            @RequestParam(defaultValue = "CSV") String format) {
+        try {
+            // Holen der CSV-Daten von der API
+            String csvData = smensoApiService.fetchProjectReport(guid, filter, format);
+
+            // Konvertieren der CSV-Daten in JSON-Format
+            List<Map<String, String>> jsonData = projectReportService.convertCsvToJson(csvData);
+
+            return ResponseEntity.ok(jsonData);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null); // Leeres Response-Body mit Fehlerstatus
+        }
+    }
+
+
+    @GetMapping("/report/{guid}")
+    public ResponseEntity<String> getProjectReport(
+            @PathVariable String guid,
+            @RequestParam(defaultValue = "active") String filter,
+            @RequestParam(defaultValue = "CSV") String format) {
+        try {
+            String csvData = smensoApiService.fetchProjectReport(guid, filter, format);
+            return ResponseEntity.ok(csvData);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Fehler beim Abrufen des Berichts: " + e.getMessage());
+        }
+    }
+
+
+
+
+    
 
     @PostMapping(value = "/project", consumes = "application/xml", produces = "application/xml")
     public String createProject(@RequestBody String xmlPayload) {

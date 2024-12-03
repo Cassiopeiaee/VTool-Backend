@@ -1,0 +1,12 @@
+export default `<!DOCTYPE html><html lang="en" data-beasties-container><head>
+  <meta charset="utf-8">
+  <title>Frontend</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles-5INURTSO.css"><style ng-app-id="ng">table[_ngcontent-ng-c2613231610]{border-collapse:collapse;width:100%}th[_ngcontent-ng-c2613231610], td[_ngcontent-ng-c2613231610]{border:1px solid #ddd;padding:8px}th[_ngcontent-ng-c2613231610]{background-color:#f2f2f2;text-align:left}button[_ngcontent-ng-c2613231610]{font-size:16px;transition:background-color .3s}button[_ngcontent-ng-c2613231610]:hover{background-color:#0056b3}</style></head>
+<body>
+  <app-root ng-version="19.0.1" ng-server-context="ssg"><app-project-list _nghost-ng-c2613231610><div _ngcontent-ng-c2613231610 style="text-align: center;"><h1 _ngcontent-ng-c2613231610>Projektliste</h1><button _ngcontent-ng-c2613231610>Projekt hinzufügen</button><table _ngcontent-ng-c2613231610><thead _ngcontent-ng-c2613231610><tr _ngcontent-ng-c2613231610><!----></tr></thead><tbody _ngcontent-ng-c2613231610><!----></tbody></table></div><!----></app-project-list></app-root>
+<script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-VML5JAAE.js" type="module"></script>
+
+</body></html>`;

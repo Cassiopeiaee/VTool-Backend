@@ -1,6 +1,8 @@
 package com.VTool;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,49 @@ public class SmensoApiService {
     public SmensoApiService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+
+
+    public String fetchProjectReport(String guid, String filter, String format) {
+        String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" 
+                        + guid + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=" + filter + "&format=" + format;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
+        headers.set("Accept", "text/csv");
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiUrl,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return response.getBody();
+        } else {
+            throw new RuntimeException("API-Anfrage fehlgeschlagen: " + response.getStatusCode());
+        }
+    }
+
+    private String buildApiUrl(String guid, String filter, String format) {
+        return "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid
+                + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=" + filter + "&format=" + format;
+    }
+
+
+    private HttpHeaders createHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
+        headers.set("Accept", "text/csv");
+        headers.set("User-Agent", "PostmanRuntime/7.43.0");
+        headers.set("Connection", "keep-alive");
+        headers.set("Accept-Encoding", "gzip, deflate, br");
+        return headers;
+    }
+
+
 
     public String createProject(String xmlPayload) {
         try {
