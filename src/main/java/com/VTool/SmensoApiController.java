@@ -3,6 +3,7 @@ package com.VTool;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +29,21 @@ public class SmensoApiController {
     }
 
     @GetMapping(value = "/projects/report", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getProjectsReport(
+    public ResponseEntity<String> getProjectsReport(
             @RequestParam String viewId,
             @RequestParam String filter,
             @RequestParam String format) {
-        return smensoApiService.getProjectsReport(viewId, filter, format);
+        String csvData = smensoApiService.getProjectsReport(viewId, filter, format);
+    
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN); // Content-Type auf text/plain setzen
+        headers.set("X-Content-Type-Options", "nosniff"); // Sicherheitseinstellung
+    
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(csvData);
     }
+    
 
     @GetMapping(value = "/projects/report/json", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Map<String, String>> getProjectsReportAsJson(

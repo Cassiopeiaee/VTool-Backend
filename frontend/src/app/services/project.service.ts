@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ProjectService {
-  private apiUrl = 'http://localhost:8080/api/projects/report/json';
+  private apiUrl = '/api/skyisland/api/Reports/projects';
 
   constructor(private http: HttpClient) {}
 
