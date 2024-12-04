@@ -1,28 +1,39 @@
-<div style="text-align: center;">
-  <h1>Projektliste</h1>
+<div>
+  <!-- Button zum Öffnen des Dialogs -->
+  <button (click)="openDialog()">Projekt abrufen</button>
 
-  <button (click)="openDialog()">Projekt hinzufügen</button>
+  <!-- Dialog für die Eingabe der GUID -->
+  <div *ngIf="dialogOpen" style="border: 1px solid #ccc; padding: 1em; background-color: #f9f9f9;">
+    <h3>Projekt-GUID eingeben</h3>
+    <input type="text" [(ngModel)]="viewId" placeholder="GUID eingeben" />
+    <button (click)="fetchProject()">Bestätigen</button>
+    <button (click)="closeDialog()">Abbrechen</button>
+  </div>
 
-  <table>
+  <!-- Statische Tabelle zur Anzeige der Projektdaten -->
+  <table border="1" style="width: 100%; margin-top: 1em;" *ngIf="projects.length">
     <thead>
       <tr>
-        <th *ngFor="let key of projects[0] | keyvalue">{{ key.key }}</th>
+        <th>Titel</th>
+        <th>Id</th>
+        <th>Typ</th>
+        <th>Beschreibung</th>
+        <th>Status</th>
+        <th>Startdatum</th>
+        <th>Enddatum</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let project of projects">
-        <td *ngFor="let key of getKeys(project)">{{ project[key] }}</td>
+        <td>{{ project.Title }}</td>
+        <td>{{ project.Id }}</td>
+        <td>{{ project.Type }}</td>
+        <td>{{ project.Description }}</td>
+        <td>{{ project.Status }}</td>
+        <td>{{ project.StartDate }}</td>
+        <td>{{ project.EndDate }}</td>
       </tr>
     </tbody>
-  </table>  
-</div>
+  </table>
 
-<div *ngIf="dialogOpen" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid black;">
-  <h2>Projekt hinzufügen</h2>
-  <label>
-    View-ID:
-    <input type="text" [(ngModel)]="viewId" />
-  </label>
-  <button (click)="fetchProject()">Bestätigen</button>
-  <button (click)="closeDialog()">Abbrechen</button>
-</div>
+

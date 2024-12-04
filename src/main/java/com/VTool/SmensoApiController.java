@@ -30,37 +30,14 @@ public class SmensoApiController {
     }
 
 
-    @GetMapping("/fetch")
-    public ResponseEntity<List<Map<String, String>>> fetchProjectData(
-            @RequestParam String guid,
-            @RequestParam(defaultValue = "active") String filter,
-            @RequestParam(defaultValue = "CSV") String format) {
+    @GetMapping("/report/{guid}")
+    public ResponseEntity<String> getProjectReport(@PathVariable String guid) {
         try {
-            // Holen der CSV-Daten von der API
-            String csvData = smensoApiService.fetchProjectReport(guid, filter, format);
-
-            // Konvertieren der CSV-Daten in JSON-Format
-            List<Map<String, String>> jsonData = projectReportService.convertCsvToJson(csvData);
-
-            return ResponseEntity.ok(jsonData);
+            String csvData = smensoApiService.fetchProjectReport(guid, "active", "CSV");
+            return ResponseEntity.ok(csvData);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null); // Leeres Response-Body mit Fehlerstatus
-        }
-    }
-
-
-    @GetMapping("/report/{guid}")
-    public ResponseEntity<String> getProjectReport(
-            @PathVariable String guid,
-            @RequestParam(defaultValue = "active") String filter,
-            @RequestParam(defaultValue = "CSV") String format) {
-        try {
-            String csvData = smensoApiService.fetchProjectReport(guid, filter, format);
-            return ResponseEntity.ok(csvData);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Fehler beim Abrufen des Berichts: " + e.getMessage());
+                    .body("Fehler beim Abrufen des Projekts: " + e.getMessage());
         }
     }
 
@@ -73,6 +50,7 @@ public class SmensoApiController {
     public String createProject(@RequestBody String xmlPayload) {
         return smensoApiService.createProject(xmlPayload);
     }
+
 
     @GetMapping(value = "/projects/report", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> getProjectsReport(
@@ -126,15 +104,6 @@ public class SmensoApiController {
         }
     }
 
-    @GetMapping("/projects/fetch-and-convert")
-    public ResponseEntity<String> fetchAndConvertCsvToXml() {
-        try {
-            String xmlData = smensoApiService.fetchAndConvertCsvToXml();
-            return ResponseEntity.ok(xmlData);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Fehler: " + e.getMessage());
-        }
-    }
 
     @RequestMapping(value = "/**")
     public String forward() {

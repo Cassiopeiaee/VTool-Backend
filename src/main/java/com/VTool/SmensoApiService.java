@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +31,7 @@ import org.springframework.web.client.HttpServerErrorException;
 @Service
 public class SmensoApiService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SmensoApiService.class);
     private final RestTemplate restTemplate;
 
     public SmensoApiService(RestTemplate restTemplate) {
@@ -37,26 +40,31 @@ public class SmensoApiService {
 
 
     public String fetchProjectReport(String guid, String filter, String format) {
-        String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" 
-                        + guid + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=" + filter + "&format=" + format;
-
+        String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid 
+                        + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=" + filter + "&format=" + format;
+    
+        logger.info("API URL: {}", apiUrl);
+    
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
         headers.set("Accept", "text/csv");
-
+    
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                apiUrl,
-                HttpMethod.GET,
-                requestEntity,
-                String.class
-        );
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("API-Anfrage fehlgeschlagen: " + response.getStatusCode());
+    
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
+    
+            logger.info("Response Status: {}", response.getStatusCode());
+            logger.info("Response Body: {}", response.getBody());
+    
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return response.getBody();
+            } else {
+                throw new RuntimeException("API returned status: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            logger.error("Error during API call", e);
+            throw new RuntimeException("Fehler beim Abrufen des Projekts: " + e.getMessage());
         }
     }
 
@@ -128,6 +136,33 @@ public class SmensoApiService {
             throw new RuntimeException("Fehler beim Verarbeiten der CSV-Daten", e);
         }
     }
+
+
+    public String fetchSingleProject(String guid) {
+        String url = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid
+                + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=active&format=CSV";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
+        headers.set("Accept", "text/csv");
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return response.getBody();
+        } else {
+            throw new RuntimeException("Fehler beim Abrufen des Projekts: " + response.getStatusCode());
+        }
+    }
+
+
 
 
 
