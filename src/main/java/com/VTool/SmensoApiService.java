@@ -2,29 +2,24 @@ package com.VTool;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.StringReader;
-import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -33,10 +28,20 @@ public class SmensoApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(SmensoApiService.class);
     private final RestTemplate restTemplate;
+    private final ProjectDataRepository projectDataRepository;
 
-    public SmensoApiService(RestTemplate restTemplate) {
+    public SmensoApiService(RestTemplate restTemplate, ProjectDataRepository projectDataRepository) {
         this.restTemplate = restTemplate;
+        this.projectDataRepository = projectDataRepository;
     }
+
+
+    public void saveProjects(List<ProjectData> projectDataList) {
+        projectDataRepository.saveAll(projectDataList);
+    }
+
+
+
 
 
     public String fetchProjectReport(String guid, String filter, String format) {
@@ -66,22 +71,6 @@ public class SmensoApiService {
             logger.error("Error during API call", e);
             throw new RuntimeException("Fehler beim Abrufen des Projekts: " + e.getMessage());
         }
-    }
-
-    private String buildApiUrl(String guid, String filter, String format) {
-        return "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid
-                + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=" + filter + "&format=" + format;
-    }
-
-
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
-        headers.set("Accept", "text/csv");
-        headers.set("User-Agent", "PostmanRuntime/7.43.0");
-        headers.set("Connection", "keep-alive");
-        headers.set("Accept-Encoding", "gzip, deflate, br");
-        return headers;
     }
 
 
@@ -169,7 +158,7 @@ public class SmensoApiService {
 
 public String getProjectsReport(String viewId, String filter, String format) {
         try {
-            // API-Endpunkt mit Parametern
+            
             String apiUrl = String.format(
                 "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects?view=%s&filter=%s&format=%s",
                 viewId, filter, format
@@ -186,7 +175,7 @@ public String getProjectsReport(String viewId, String filter, String format) {
             // API-Aufruf
             ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
 
-            // Rückgabe der CSV-Daten
+            
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Client-Fehler: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
@@ -198,114 +187,71 @@ public String getProjectsReport(String viewId, String filter, String format) {
     }
 
 
-    public String fetchAndConvertCsvToXml() {
-        try {
-            // Abrufen der CSV-Daten
-            String csvData = fetchCsvData();
 
-            // Konvertierung von CSV zu XML
-            String xmlData = convertCsvToXml(csvData);
 
-            // Validierung der XML-Daten
-            validateXml(xmlData);
 
-            return xmlData;
-        } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Verarbeiten der CSV-Daten: " + e.getMessage(), e);
-        }
+
+    @Transactional
+    public void saveProjectData(List<ProjectData> projectDataList) {
+        projectDataRepository.saveAll(projectDataList);
     }
 
-    private String fetchCsvData() {
-        try {
-            String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/aaf1cdae-9da4-4493-85fb-92fc3fb162b5?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=active&format=CSV";
+    public void saveCsvDataToDatabase(String csvData) {
+        List<ProjectData> projectDataList = parseCsvToProjectData(csvData);
+        saveProjectData(projectDataList);
+    }
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Basic NjA0ZGY5NWEtNjNmZi00YTU3LWJjYTUtNGYxMDlkZjEwN2Y1OnlYaG1PR1M0VjQwZ0FzV1VBYlJvU2h0SXMxRW41Q255");
-            headers.setAccept(List.of(MediaType.TEXT_PLAIN));
+    private List<ProjectData> parseCsvToProjectData(String csvData) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(csvData))) {
+            String headerLine = reader.readLine(); // Erste Zeile enthält Header
 
-            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
-
-            if (response.getBody() == null || response.getBody().isEmpty()) {
-                throw new RuntimeException("Keine CSV-Daten erhalten.");
+            if (headerLine == null || headerLine.isEmpty()) {
+                throw new RuntimeException("CSV-Daten enthalten keine Header");
             }
 
-            return response.getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Abrufen der CSV-Daten: " + e.getMessage(), e);
-        }
-    }
+            String[] headers = headerLine.split(","); // Header in Felder aufteilen
+            List<ProjectData> projectDataList = new ArrayList<>();
 
-    private String convertCsvToXml(String csvData) {
-        try {
-            // Bereinigen der CSV-Daten
-            String sanitizedCsvData = sanitizeCsv(csvData);
-    
-            // Baue das XML
-            StringBuilder xmlBuilder = new StringBuilder("<Projects>");
-    
-            // Zeilen in der CSV-Daten
-            String[] lines = sanitizedCsvData.split("\n");
-            if (lines.length <= 1) {
-                throw new RuntimeException("CSV enthält keine Projektdaten.");
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",", -1); // Datenzeile in Felder aufteilen
+                ProjectData projectData = new ProjectData();
+
+                projectData.setId(values[getIndex(headers, "Id")]);
+                projectData.setTitle(values[getIndex(headers, "Title")]);
+                projectData.setType(values[getIndex(headers, "Type")]);
+                projectData.setDescription(values[getIndex(headers, "Description")]);
+                projectData.setStatus(values[getIndex(headers, "Status")]);
+                projectData.setStartDate(parseDate(values[getIndex(headers, "Start Date")]));
+                projectData.setEndDate(parseDate(values[getIndex(headers, "End Date")]));
+
+                projectDataList.add(projectData);
             }
-    
-            // Kopfzeile überspringen und Datenzeilen iterieren
-            for (int i = 1; i < lines.length; i++) {
-                String[] values = lines[i].split(",", -1); // -1 behält leere Felder bei
-    
-                xmlBuilder.append("<Project>");
-                xmlBuilder.append("<Id>").append(values[0].trim()).append("</Id>");
-                xmlBuilder.append("<Title><![CDATA[").append(values[1].trim()).append("]]></Title>");
-                xmlBuilder.append("<Start>").append(values[2].trim()).append("</Start>");
-                xmlBuilder.append("<End>").append(values[3].trim()).append("</End>");
-                xmlBuilder.append("<Description><![CDATA[").append(values[4].trim()).append("]]></Description>");
-                xmlBuilder.append("<TypeId>").append(values[5].trim()).append("</TypeId>");
-                xmlBuilder.append("<FolderId>").append(values[6].trim()).append("</FolderId>");
-                xmlBuilder.append("<LocationId>").append(values[7].trim()).append("</LocationId>");
-                xmlBuilder.append("<Private>").append(values[8].trim()).append("</Private>");
-                xmlBuilder.append("</Project>");
+
+            return projectDataList;
+        } catch (Exception e) {
+            throw new RuntimeException("Fehler beim Verarbeiten der CSV-Daten", e);
+        }
+    }
+
+    private int getIndex(String[] headers, String headerName) {
+        for (int i = 0; i < headers.length; i++) {
+            if (headers[i].trim().equalsIgnoreCase(headerName)) {
+                return i;
             }
-    
-            xmlBuilder.append("</Projects>");
-            return xmlBuilder.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Fehler bei der Konvertierung von CSV zu XML: " + e.getMessage(), e);
         }
+        throw new IllegalArgumentException("Header '" + headerName + "' nicht gefunden");
     }
 
-    private String sanitizeCsv(String csvData) {
-        // Entferne ungültige XML-Zeichen
-        return csvData.replaceAll("[^\\x20-\\x7E]", "") // Nicht-druckbare Zeichen entfernen
-                      .replaceAll("&", "&amp;")        // Ersetze & durch &amp;
-                      .replaceAll("<", "&lt;")         // Ersetze < durch &lt;
-                      .replaceAll(">", "&gt;");        // Ersetze > durch &gt;
+    private LocalDate parseDate(String date) {
+        return date.isEmpty() ? null : LocalDate.parse(date, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     }
 
-    private void validateXml(String xmlData) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.parse(new InputSource(new StringReader(xmlData)));
-        } catch (Exception e) {
-            throw new RuntimeException("Generiertes XML ist ungültig: " + e.getMessage(), e);
-        }
+    private LocalDateTime parseDateTime(String dateTime) {
+        return dateTime.isEmpty() ? null : LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"));
     }
 
-
-
-
-
-
-    @GetMapping
-    public ResponseEntity<List<Project>> getProjects() {
-        // Beispielhafte Projektdaten (kann aus der Datenbank kommen)
-        List<Project> projects = List.of(
-            new Project("1", "Testprojekt", "Dies ist ein Testprojekt", "2023-05-01", "2023-06-01"),
-            new Project("2", "Beispielprojekt", "Dies ist ein Beispiel", "2023-07-01", "2023-08-01")
-        );
-
-        return ResponseEntity.ok(projects);
+    private Double parseDouble(String number) {
+        return number.isEmpty() ? null : Double.parseDouble(number);
     }
 }

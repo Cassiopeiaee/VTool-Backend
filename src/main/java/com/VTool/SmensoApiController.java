@@ -31,13 +31,13 @@ public class SmensoApiController {
 
 
     @GetMapping("/report/{guid}")
-    public ResponseEntity<String> getProjectReport(@PathVariable String guid) {
+    public ResponseEntity<String> fetchAndSaveProject(@PathVariable String guid) {
         try {
             String csvData = smensoApiService.fetchProjectReport(guid, "active", "CSV");
-            return ResponseEntity.ok(csvData);
+            smensoApiService.saveCsvDataToDatabase(csvData);
+            return ResponseEntity.ok("Projekt erfolgreich gespeichert.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Fehler beim Abrufen des Projekts: " + e.getMessage());
+            return ResponseEntity.status(500).body("Fehler beim Speichern des Projekts: " + e.getMessage());
         }
     }
 
@@ -60,8 +60,8 @@ public class SmensoApiController {
         String csvData = smensoApiService.getProjectsReport(viewId, filter, format);
     
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN); // Content-Type auf text/plain setzen
-        headers.set("X-Content-Type-Options", "nosniff"); // Sicherheitseinstellung
+        headers.setContentType(MediaType.TEXT_PLAIN); 
+        headers.set("X-Content-Type-Options", "nosniff"); 
     
         return ResponseEntity.ok()
                 .headers(headers)

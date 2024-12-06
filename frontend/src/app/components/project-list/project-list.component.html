@@ -1,16 +1,22 @@
-<div>
-  <!-- Button zum Öffnen des Dialogs -->
-  <button (click)="openDialog()">Projekt abrufen</button>
+<div style="padding: 1em;">
+  <!-- Überschrift -->
+  <h1 style="text-align: center;">Projekt Importieren</h1>
 
-  <!-- Dialog für die Eingabe der GUID -->
-  <div *ngIf="dialogOpen" style="border: 1px solid #ccc; padding: 1em; background-color: #f9f9f9;">
-    <h3>Projekt-GUID eingeben</h3>
-    <input type="text" [(ngModel)]="viewId" placeholder="GUID eingeben" />
+  <!-- Buttons für Aktionen -->
+  <div style="text-align: center; margin-top: 1em;">
+    <button style="margin-right: 1em;" (click)="openDialog()">Projekt abrufen</button>
+    <button (click)="viewSavedProjects()">Gespeicherte Projekte</button>
+  </div>
+
+  <!-- Dialog für die Eingabe der View-ID -->
+  <div *ngIf="dialogOpen" style="border: 1px solid #ccc; padding: 1em; background-color: #f9f9f9; margin-top: 1em;">
+    <h3>Projekt-View-ID eingeben</h3>
+    <input type="text" [(ngModel)]="viewId" placeholder="View-ID eingeben" />
     <button (click)="fetchProject()">Bestätigen</button>
     <button (click)="closeDialog()">Abbrechen</button>
   </div>
 
-  <!-- Statische Tabelle zur Anzeige der Projektdaten -->
+  <!-- Tabelle zur Anzeige der Projektdaten -->
   <table border="1" style="width: 100%; margin-top: 1em;" *ngIf="projects.length">
     <thead>
       <tr>
@@ -30,10 +36,9 @@
         <td>{{ project.Type }}</td>
         <td>{{ project.Description }}</td>
         <td>{{ project.Status }}</td>
-        <td>{{ project.StartDate }}</td>
-        <td>{{ project.EndDate }}</td>
+        <td>{{ project["Start date"] }}</td>
+        <td>{{ project["End date"] }}</td>
       </tr>
     </tbody>
   </table>
-
-
+</div>

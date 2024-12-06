@@ -11,23 +11,23 @@ import { CommonModule } from '@angular/common';
   imports: [FormsModule, CommonModule],
 })
 export class ProjectListComponent {
-  projects: any[] = []; 
-  viewId = ''; 
-  dialogOpen = false; 
+  projects: any[] = []; // Speichert alle empfangenen Projekte
+  viewId = ''; // Speichert die View-ID für das aktuelle Projekt
+  dialogOpen = false; // Steuert, ob der Dialog geöffnet ist
 
   constructor(private http: HttpClient) {}
 
-  
+  // Öffnet den Eingabedialog
   openDialog(): void {
     this.dialogOpen = true;
   }
 
-  
+  // Schließt den Eingabedialog
   closeDialog(): void {
     this.dialogOpen = false;
   }
 
-  // Ruft die Daten vom Backend ab
+  // Ruft ein Projekt vom Backend ab
   fetchProject(): void {
     if (!this.viewId.trim()) {
       alert('Bitte geben Sie eine gültige View-ID ein.');
@@ -41,8 +41,9 @@ export class ProjectListComponent {
       next: (response) => {
         console.log('CSV-Antwort:', response);
         const parsedData = this.parseCsvData(response); // CSV-Daten parsen
-        this.projects = [parsedData]; // Aktualisiere die Tabelle
-        this.closeDialog(); 
+        this.projects.push(parsedData); // Neues Projekt hinzufügen
+        this.closeDialog(); // Dialog schließen
+        this.viewId = ''; // Zurücksetzen des Eingabefeldes
       },
       error: (error) => {
         console.error('Fehler beim Abrufen des Projekts:', error);
@@ -68,5 +69,12 @@ export class ProjectListComponent {
     });
 
     return project;
+  }
+
+
+
+  viewSavedProjects(): void {
+    console.log('Gespeicherte Projekte anzeigen');
+    // Implementiere die Logik, um gespeicherte Projekte zu laden und anzuzeigen.
   }
 }
