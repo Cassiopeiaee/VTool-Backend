@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { RouterModule, Router } from '@angular/router'; 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -8,14 +9,14 @@ import { CommonModule } from '@angular/common';
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
 })
 export class ProjectListComponent {
   projects: any[] = []; // Speichert alle empfangenen Projekte
   viewId = ''; // Speichert die View-ID für das aktuelle Projekt
   dialogOpen = false; // Steuert, ob der Dialog geöffnet ist
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {} // Router hinzufügen
 
   // Öffnet den Eingabedialog
   openDialog(): void {
@@ -71,10 +72,9 @@ export class ProjectListComponent {
     return project;
   }
 
-
-
+  // Navigiert zur Seite "Gespeicherte Projekte"
   viewSavedProjects(): void {
-    console.log('Gespeicherte Projekte anzeigen');
-    // Implementiere die Logik, um gespeicherte Projekte zu laden und anzuzeigen.
+    console.log("/gespeichterte Projekt anschauen");
+    this.router.navigate(['/gespeicherte-projekte']); // Navigiert zur neuen Seite
   }
 }

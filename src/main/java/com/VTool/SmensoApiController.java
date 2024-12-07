@@ -23,10 +23,12 @@ public class SmensoApiController {
 
     private final SmensoApiService smensoApiService;
     private final ProjectReportService projectReportService;
+    private final ProjectDataRepository projectDataRepository;
 
-    public SmensoApiController(SmensoApiService smensoApiService, ProjectReportService projectReportService) {
+    public SmensoApiController(SmensoApiService smensoApiService, ProjectReportService projectReportService, ProjectDataRepository projectDataRepository) {
         this.smensoApiService = smensoApiService;
         this.projectReportService = projectReportService;
+        this.projectDataRepository = projectDataRepository;
     }
 
 
@@ -109,5 +111,16 @@ public class SmensoApiController {
     public String forward() {
         // Weiterleitung zu Angulars index.html
         return "forward:/index.html";
+    }
+
+
+
+
+
+
+
+    @GetMapping("/api/saved-projects")
+    public List<ProjectData> getSavedProjects() {
+        return projectDataRepository.findAll(); // Alle gespeicherten Projekte abrufen
     }
 }
