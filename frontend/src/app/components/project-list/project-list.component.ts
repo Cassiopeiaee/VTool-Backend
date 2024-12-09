@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RouterModule, Router } from '@angular/router'; 
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -31,50 +31,109 @@ export class ProjectListComponent {
   // Ruft ein Projekt vom Backend ab
   fetchProject(): void {
     if (!this.viewId.trim()) {
-      alert('Bitte geben Sie eine gültige View-ID ein.');
-      return;
+        alert('Bitte geben Sie eine gültige View-ID ein.');
+        return;
     }
 
     const backendUrl = `http://localhost:8080/smenso/report/${this.viewId}`;
     console.log('API-URL:', backendUrl);
 
     this.http.get<string>(backendUrl, { responseType: 'text' as 'json' }).subscribe({
-      next: (response) => {
-        console.log('CSV-Antwort:', response);
-        const parsedData = this.parseCsvData(response); // CSV-Daten parsen
-        this.projects.push(parsedData); // Neues Projekt hinzufügen
-        this.closeDialog(); // Dialog schließen
-        this.viewId = ''; // Zurücksetzen des Eingabefeldes
+        next: (response) => {
+            console.log('CSV-Antwort erhalten:', response);
+
+            if (response.trim().startsWith('Projekt erfolgreich gespeichert.')) {
+                alert('Projekt wurde erfolgreich gespeichert, aber keine neuen CSV-Daten empfangen.');
+                return;
+            }
+
+            const parsedData = this.parseCsvData(response);
+            if (parsedData.length > 0) {
+                this.projects = [...this.projects, ...parsedData];
+                console.log('Aktualisierte Projekte:', this.projects);
+            } else {
+                alert('Die empfangenen Daten sind ungültig.');
+            }
+
+            this.closeDialog();
+            this.viewId = ''; // Eingabefeld zurücksetzen
+        },
+        error: (error) => {
+            console.error('Fehler beim Abrufen des Projekts:', error);
+            alert('Fehler beim Abrufen des Projekts. Bitte prüfen Sie die View-ID.');
+        },
+    });
+}
+
+  
+  
+
+  // Speichert das erste Projekt in der Datenbank
+  saveProjectToDatabase(): void {
+    if (this.projects.length === 0) {
+      alert('Es gibt kein Projekt, das gespeichert werden kann.');
+      return;
+    }
+
+    const projectToSave = this.projects[0]; // Wähle das erste Projekt aus der Liste
+
+    const apiUrl = 'http://localhost:8080/smenso/save-project'; 
+    this.http.post(apiUrl, projectToSave).subscribe({
+      next: () => {
+        alert('Projekt wurde erfolgreich in der Datenbank gespeichert.');
       },
       error: (error) => {
-        console.error('Fehler beim Abrufen des Projekts:', error);
-        alert('Fehler beim Abrufen des Projekts. Bitte prüfen Sie die View-ID.');
+        console.error('Fehler beim Speichern des Projekts:', error);
+        alert('Fehler beim Speichern des Projekts.');
       },
     });
   }
 
   // Parsed CSV-Daten in ein Array von Objekten
-  private parseCsvData(csv: string): any {
-    const lines = csv.split('\n');
-    const headers = lines[0]?.split(',');
-    const values = lines[1]?.split(',');
-
-    if (!headers || !values) {
-      console.error('Ungültige CSV-Daten:', csv);
-      return {};
+  private parseCsvData(csv: string): any[] {
+    console.log('Empfangene CSV-Daten:', csv);
+  
+    // Prüfen, ob die Daten im CSV-Format sind
+    if (!csv.includes(',')) {
+      console.error('Ungültige CSV-Daten: Kein gültiges CSV-Format', csv);
+      return []; // Leeres Array zurückgeben
     }
-
-    const project: any = {};
-    headers.forEach((header, index) => {
-      project[header.trim()] = values[index]?.trim() || 'Nicht verfügbar';
+  
+    const lines = csv.split('\n').filter(line => line.trim() !== ''); // Leere Zeilen entfernen
+    if (lines.length < 2) {
+      console.error('Ungültige CSV-Daten: Zu wenig Zeilen', csv);
+      return [];
+    }
+  
+    const headers = lines[0]?.split(',');
+    const dataRows = lines.slice(1);
+  
+    if (!headers || headers.length === 0) {
+      console.error('Ungültige CSV-Daten: Header fehlen', csv);
+      return [];
+    }
+  
+    // Konvertiere jede Zeile in ein Objekt basierend auf den Headern
+    const parsedData: any[] = dataRows.map(row => {
+      const values = row.split(',');
+      const rowObject: any = {};
+      headers.forEach((header, index) => {
+        rowObject[header.trim()] = values[index]?.trim() || 'Nicht verfügbar';
+      });
+      return rowObject;
     });
-
-    return project;
+  
+    console.log('Parsed Data:', parsedData); // Debugging-Ausgabe
+  
+    return parsedData; // Array von Objekten zurückgeben
   }
+  
+  
+  
 
   // Navigiert zur Seite "Gespeicherte Projekte"
   viewSavedProjects(): void {
     console.log("/gespeichterte Projekt anschauen");
-    this.router.navigate(['/gespeicherte-projekte']); // Navigiert zur neuen Seite
+    this.router.navigate(['/gespeicherte-projekte']); 
   }
 }

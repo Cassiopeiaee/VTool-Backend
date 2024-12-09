@@ -55,33 +55,38 @@ public class ProjectScheduler {
     // Methode zum Parsen der CSV-Daten
     private List<ProjectData> parseCsvData(String csvData) {
         List<ProjectData> projects = new ArrayList<>();
-
+    
         try (BufferedReader reader = new BufferedReader(new StringReader(csvData))) {
             String headerLine = reader.readLine(); // Kopfzeile ignorieren
             String line;
-
+    
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split(",");
-
-                if (values.length < 7) continue; // Ungültige Zeilen überspringen
-
+    
+                if (values.length < 8) continue; // Ungültige Zeilen überspringen
+    
                 ProjectData project = new ProjectData(); // Verwendung der korrekten Entitätsklasse
                 project.setId(values[0].trim());
                 project.setTitle(values[1].trim());
-                project.setType(values[2].trim());
-                project.setDescription(values[3].trim());
-                project.setStatus(values[4].trim());
-                project.setStartDate(parseDate(values[5].trim()));
-                project.setEndDate(parseDate(values[6].trim()));
-
+                project.setStatus(values[3].trim()); // Status anpassen, da "Type" entfernt wurde
+                try {
+                    project.setProgress(Integer.parseInt(values[4].trim()));
+                } catch (NumberFormatException e) {
+                    project.setProgress(0); // Fallback auf 0 bei ungültigen Werten
+                }
+                project.setCostStatus(values[5].trim());
+                project.setStartDate(values[6].trim()); // Startdatum
+                project.setEndDate(values[7].trim());   // Enddatum
+    
                 projects.add(project);
             }
         } catch (Exception e) {
             System.err.println("Fehler beim Parsen der CSV-Daten: " + e.getMessage());
         }
-
+    
         return projects;
     }
+    
 
     // Hilfsmethode zum Parsen von Datum
     private LocalDate parseDate(String date) {

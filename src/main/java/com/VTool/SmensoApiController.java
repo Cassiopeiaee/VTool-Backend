@@ -34,14 +34,50 @@ public class SmensoApiController {
 
     @GetMapping("/report/{guid}")
     public ResponseEntity<String> fetchAndSaveProject(@PathVariable String guid) {
+        System.out.println("Erhaltene View-ID: " + guid);
+    
         try {
+            // Abrufen des CSV-Datensatzes
             String csvData = smensoApiService.fetchProjectReport(guid, "active", "CSV");
-            smensoApiService.saveCsvDataToDatabase(csvData);
-            return ResponseEntity.ok("Projekt erfolgreich gespeichert.");
+            System.out.println("Erhaltene CSV-Daten:\n" + csvData);
+    
+            // Konvertierung von CSV zu Projektdaten
+            List<ProjectData> projects = smensoApiService.parseCsvToProjectData(csvData);
+    
+            // Alle vorherigen Projekte löschen
+            projectDataRepository.deleteAll();
+    
+            // Nur das aktuelle Projekt speichern und zurückgeben
+            if (!projects.isEmpty()) {
+                ProjectData currentProject = projects.get(0); // Nehmen wir das erste Projekt
+                projectDataRepository.save(currentProject);
+    
+                String csvResponse = String.format("Id,Title,Status,Progress,Cost Status,Start date,End date\n%s,%s,%s,%d,%s,%s,%s\n",
+                    currentProject.getId(),
+                    currentProject.getTitle(),
+                    currentProject.getStatus(),
+                    currentProject.getProgress(),
+                    currentProject.getCostStatus(),
+                    currentProject.getStartDate(),
+                    currentProject.getEndDate()
+                );
+    
+                return ResponseEntity.ok(csvResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body("Kein Projekt gefunden.");
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Fehler beim Speichern des Projekts: " + e.getMessage());
+            System.err.println("Fehler beim Abrufen oder Speichern des Projekts: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Fehler beim Speichern des Projekts: " + e.getMessage());
         }
     }
+    
+    
+    
+    
+    
 
 
 
@@ -115,7 +151,16 @@ public class SmensoApiController {
 
 
 
-
+    @PostMapping("/save-project")
+public ResponseEntity<String> saveProject(@RequestBody ProjectData project) {
+    try {
+        projectDataRepository.save(project); // Speichere das Projekt in der Datenbank
+        return ResponseEntity.ok("Projekt erfolgreich gespeichert.");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Fehler beim Speichern des Projekts: " + e.getMessage());
+    }
+}
 
 
 

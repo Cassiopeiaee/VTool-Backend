@@ -3,6 +3,7 @@ package com.VTool;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +12,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
+
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -57,13 +65,22 @@ public class SmensoApiService {
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     
         try {
-            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
+            // API-Antwort als byte[] abrufen, um Dekodierungsprobleme zu umgehen
+            ResponseEntity<byte[]> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, byte[].class);
     
             logger.info("Response Status: {}", response.getStatusCode());
-            logger.info("Response Body: {}", response.getBody());
+            logger.info("Response Headers: {}", response.getHeaders());
     
             if (response.getStatusCode() == HttpStatus.OK) {
-                return response.getBody();
+                try {
+                    // CSV-Daten dekodieren
+                    String decodedCsv = new String(response.getBody(), StandardCharsets.UTF_8);
+                    logger.info("Decoded CSV Data: {}", decodedCsv);
+                    return decodedCsv;
+                } catch (Exception e) {
+                    logger.error("Error decoding CSV data", e);
+                    throw new RuntimeException("Fehler beim Dekodieren der CSV-Daten: " + e.getMessage());
+                }
             } else {
                 throw new RuntimeException("API returned status: " + response.getStatusCode());
             }
@@ -72,6 +89,7 @@ public class SmensoApiService {
             throw new RuntimeException("Fehler beim Abrufen des Projekts: " + e.getMessage());
         }
     }
+    
 
 
 
@@ -167,7 +185,7 @@ public String getProjectsReport(String viewId, String filter, String format) {
             // Header konfigurieren
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Basic NjA0ZGY5NWEtNjNmZi00YTU3LWJjYTUtNGYxMDlkZjEwN2Y1OnlYaG1PR1M0VjQwZ0FzV1VBYlJvU2h0SXMxRW41Q255");
-            headers.setAccept(List.of(MediaType.TEXT_PLAIN)); // Akzeptiere CSV als Text
+            headers.setAccept(List.of(MediaType.TEXT_PLAIN)); 
 
             // Anfrage erstellen
             HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
@@ -198,60 +216,93 @@ public String getProjectsReport(String viewId, String filter, String format) {
 
     public void saveCsvDataToDatabase(String csvData) {
         List<ProjectData> projectDataList = parseCsvToProjectData(csvData);
-        saveProjectData(projectDataList);
+        projectDataRepository.saveAll(projectDataList);
     }
 
-    private List<ProjectData> parseCsvToProjectData(String csvData) {
-        try (BufferedReader reader = new BufferedReader(new StringReader(csvData))) {
-            String headerLine = reader.readLine(); // Erste Zeile enthält Header
 
-            if (headerLine == null || headerLine.isEmpty()) {
-                throw new RuntimeException("CSV-Daten enthalten keine Header");
+
+
+    public List<ProjectData> parseCsvToProjectData(String csvData) {
+    List<ProjectData> projects = new ArrayList<>();
+    try {
+        // OpenCSV-Parser erstellen
+        CSVReader reader = new CSVReader(new StringReader(csvData));
+        String[] headers = reader.readNext(); // Header-Zeile lesen
+
+        if (headers == null) {
+            throw new RuntimeException("Die CSV-Daten enthalten keine Header-Zeile.");
+        }
+
+        String[] line;
+        while ((line = reader.readNext()) != null) {
+            // Überspringen von leeren Zeilen
+            if (line.length == 0 || line[0].trim().isEmpty()) {
+                continue;
             }
 
-            String[] headers = headerLine.split(","); // Header in Felder aufteilen
-            List<ProjectData> projectDataList = new ArrayList<>();
+            ProjectData project = new ProjectData();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",", -1); // Datenzeile in Felder aufteilen
-                ProjectData projectData = new ProjectData();
+            // Mapping der CSV-Werte zu den Feldern
+            project.setId(getValue(headers, line, "Id"));
+            project.setTitle(getValue(headers, line, "Title"));
+            project.setStatus(getValue(headers, line, "Status"));
 
-                projectData.setId(values[getIndex(headers, "Id")]);
-                projectData.setTitle(values[getIndex(headers, "Title")]);
-                projectData.setType(values[getIndex(headers, "Type")]);
-                projectData.setDescription(values[getIndex(headers, "Description")]);
-                projectData.setStatus(values[getIndex(headers, "Status")]);
-                projectData.setStartDate(parseDate(values[getIndex(headers, "Start Date")]));
-                projectData.setEndDate(parseDate(values[getIndex(headers, "End Date")]));
-
-                projectDataList.add(projectData);
+            // Progress behandeln
+            try {
+                project.setProgress(Integer.parseInt(getValue(headers, line, "Progress")));
+            } catch (NumberFormatException e) {
+                System.err.println("Ungültiger Progress-Wert: " + getValue(headers, line, "Progress"));
+                project.setProgress(0); // Standardwert setzen
             }
 
-            return projectDataList;
-        } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Verarbeiten der CSV-Daten", e);
+            project.setCostStatus(getValue(headers, line, "Cost Status"));
+
+            // Start- und Enddate setzen
+            String startDate = getValue(headers, line, "Start date");
+            String endDate = getValue(headers, line, "End date");
+
+            project.setStartDate((startDate == null || startDate.isEmpty()) ? "Nicht verfügbar" : startDate);
+            project.setEndDate((endDate == null || endDate.isEmpty()) ? "Nicht verfügbar" : endDate);
+
+            System.out.println("Geparstes Projekt: " + project);
+            projects.add(project);
+        }
+    } catch (Exception e) {
+        throw new RuntimeException("Fehler beim Parsing der CSV-Daten", e);
+    }
+    return projects;
+}
+
+private String getValue(String[] headers, String[] values, String columnName) {
+    for (int i = 0; i < headers.length; i++) {
+        if (headers[i].equalsIgnoreCase(columnName)) {
+            return i < values.length ? values[i].trim() : "";
         }
     }
-
-    private int getIndex(String[] headers, String headerName) {
-        for (int i = 0; i < headers.length; i++) {
-            if (headers[i].trim().equalsIgnoreCase(headerName)) {
-                return i;
-            }
+    return ""; // Standardwert, falls die Spalte nicht gefunden wird
+}
+    // Helper-Methode zur Bereinigung
+    private String sanitizeDate(String dateValue) {
+        if (dateValue == null || dateValue.trim().isEmpty() || dateValue.trim().equals("0")) {
+            return "Nicht verfügbar";
         }
-        throw new IllegalArgumentException("Header '" + headerName + "' nicht gefunden");
+        return dateValue.trim();
     }
 
-    private LocalDate parseDate(String date) {
-        return date.isEmpty() ? null : LocalDate.parse(date, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+    
+
+
+    private LocalDate parseDate(String dateStr) {
+    if (dateStr == null || dateStr.isEmpty() || dateStr.equals("0")) {
+        return null; // Ungültige Werte werden ignoriert
     }
 
-    private LocalDateTime parseDateTime(String dateTime) {
-        return dateTime.isEmpty() ? null : LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"));
+    try {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        return LocalDate.parse(dateStr, formatter);
+    } catch (DateTimeParseException e) {
+        throw new RuntimeException("Ungültiges Datumsformat: " + dateStr, e);
     }
+}
 
-    private Double parseDouble(String number) {
-        return number.isEmpty() ? null : Double.parseDouble(number);
-    }
 }

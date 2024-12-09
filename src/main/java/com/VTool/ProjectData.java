@@ -2,9 +2,10 @@ package com.VTool;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
+import org.hibernate.sql.ast.tree.expression.Star;
+
 import jakarta.persistence.Column;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 public class ProjectData {
@@ -16,19 +17,19 @@ public class ProjectData {
     private String title;
 
     @Column
-    private String type; 
-
-    @Column
-    private String description; 
-
-    @Column
     private String status; 
 
     @Column
-    private LocalDate startDate; 
+    private Integer progress;
 
     @Column
-    private LocalDate endDate;
+    private String costStatus;
+
+    @Column
+    private String StartDate;
+
+    @Column
+    private String EndDate;
 
 
     // Getter und Setter für alle Felder
@@ -48,22 +49,6 @@ public class ProjectData {
         this.title = title;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -72,19 +57,36 @@ public class ProjectData {
         this.status = status;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public Integer getProgress() {
+        return progress;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public void setProgress(Integer progress) {
+        this.progress = progress;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public String getCostStatus() {
+        return costStatus;
     }
 
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setCostStatus(String costStatus) {
+        this.costStatus = costStatus;
     }
+
+    public String getStartDate() {
+        return StartDate;
+    }
+
+    public void setStartDate(String StartDate) {
+        this.StartDate = StartDate;
+    }
+
+    public String getEndDate() {
+        return EndDate;
+    }
+
+    public void setEndDate(String EndDate) {
+        this.EndDate = EndDate;
+    }
+
 }
