@@ -1,31 +1,41 @@
 <div style="padding: 1em;">
-    <h1 style="text-align: center;">Gespeicherte Projekte</h1>
-  
-    <table border="1" style="width: 100%; margin-top: 1em;" *ngIf="savedProjects.length">
-      <thead>
-        <tr>
-          <th>Titel</th>
-          <th>ID</th>
-          <th>Typ</th>
-          <th>Beschreibung</th>
-          <th>Status</th>
-          <th>Startdatum</th>
-          <th>Enddatum</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let project of savedProjects">
-          <td>{{ project.title }}</td>
-          <td>{{ project.id }}</td>
-          <td>{{ project.type }}</td>
-          <td>{{ project.description }}</td>
-          <td>{{ project.status }}</td>
-          <td>{{ project.startDate }}</td>
-          <td>{{ project.endDate }}</td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <p *ngIf="!savedProjects.length" style="text-align: center;">Keine gespeicherten Projekte verfügbar.</p>
+  <h1 style="text-align: center;">Gespeicherte Projekte</h1>
+
+  <!-- Tabelle zur Anzeige der gespeicherten Projekte -->
+  <table border="1" style="width: 100%; margin-top: 1em;" *ngIf="savedProjects.length">
+    <thead>
+      <tr>
+        <th>Titel</th>
+        <th>ID</th>
+        <th>Typ</th>
+        <th>Beschreibung</th>
+        <th>Status</th>
+        <th>Startdatum</th>
+        <th>Enddatum</th>
+        <th>Download Excel</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of savedProjects">
+        <td>{{ project.title }}</td>
+        <td>{{ project.id }}</td>
+        <td>{{ project.type }}</td>
+        <td>{{ project.description }}</td>
+        <td>{{ project.status }}</td>
+        <td>{{ project.startDate }}</td>
+        <td>{{ project.endDate }}</td>
+        <td>
+          <button (click)="downloadProjectAsExcel(project.id)">Download</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!savedProjects.length" style="text-align: center;">
+    Keine gespeicherten Projekte verfügbar.
+  </p>
+
+  <div style="text-align: center; margin-top: 1em;">
+    <button (click)="goBackToMain()">Zurück</button>
   </div>
-  
+</div>
