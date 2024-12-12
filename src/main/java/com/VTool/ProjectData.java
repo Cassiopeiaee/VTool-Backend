@@ -1,5 +1,7 @@
 package com.VTool;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -8,6 +10,8 @@ import jakarta.persistence.Id;
 public class ProjectData {
 
     @Id
+    @JsonProperty("id")
+    @Column (columnDefinition = "text")
     private String id;
 
     @Column(columnDefinition = "text")
@@ -144,10 +148,12 @@ public class ProjectData {
 
     // Getter und Setter für alle Felder
 
+    @JsonProperty("id")
     public String getId() {
         return id;
     }
 
+   @JsonProperty("id")
     public void setId(String id) {
         this.id = id;
     }
@@ -503,6 +509,58 @@ public class ProjectData {
 
     public void setCostStatus(String costStatus) {
         this.costStatus = costStatus;
+    }
+
+
+    @Override
+    public String toString() {
+        return "ProjectData{" +
+                "id='" + id + '\'' +
+                ", code='" + code + '\'' +
+                ", type='" + type + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", benefit='" + benefit + '\'' +
+                ", goal='" + goal + '\'' +
+                ", privateField='" + privateField + '\'' +
+                ", template='" + template + '\'' +
+                ", archived='" + archived + '\'' +
+                ", blockTimesRecording='" + blockTimesRecording + '\'' +
+                ", status='" + status + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", budget='" + budget + '\'' +
+                ", folder='" + folder + '\'' +
+                ", department='" + department + '\'' +
+                ", location='" + location + '\'' +
+                ", projectManager='" + projectManager + '\'' +
+                ", projectManagerEmail='" + projectManagerEmail + '\'' +
+                ", statusName='" + statusName + '\'' +
+                ", statusDate='" + statusDate + '\'' +
+                ", overallStatus='" + overallStatus + '\'' +
+                ", targetDate='" + targetDate + '\'' +
+                ", progress=" + progress +
+                ", appointmentsStatus='" + appointmentsStatus + '\'' +
+                ", costsStatus='" + costsStatus + '\'' +
+                ", goalsStatus='" + goalsStatus + '\'' +
+                ", explanation='" + explanation + '\'' +
+                ", nextSteps='" + nextSteps + '\'' +
+                ", planCost='" + planCost + '\'' +
+                ", actualCost='" + actualCost + '\'' +
+                ", planDuration='" + planDuration + '\'' +
+                ", actualEffort='" + actualEffort + '\'' +
+                ", forecastEffort='" + forecastEffort + '\'' +
+                ", recordedTime='" + recordedTime + '\'' +
+                ", workflow='" + workflow + '\'' +
+                ", taskTemplate='" + taskTemplate + '\'' +
+                ", createdOn='" + createdOn + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedOn='" + updatedOn + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", labels='" + labels + '\'' +
+                ", lockedFlavors='" + lockedFlavors + '\'' +
+                ", costStatus='" + costStatus + '\'' +
+                '}';
     }
 }
 

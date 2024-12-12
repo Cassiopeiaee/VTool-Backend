@@ -352,7 +352,8 @@ public String getProjectsReport(String viewId, String filter, String format) {
                 project.setTitle(getValue(headers, line, "Title"));
                 project.setStatus(getValue(headers, line, "Status"));
                 try {
-                    project.setProgress(Integer.parseInt(getValue(headers, line, "Progress")));
+                    String progressStr = getValue(headers, line, "Progress").replace("%", "").trim();
+                    project.setProgress(Integer.parseInt(progressStr));
                 } catch (NumberFormatException e) {
                     System.err.println("Ungültiger Progress-Wert: " + getValue(headers, line, "Progress"));
                     project.setProgress(0); // Standardwert setzen
@@ -423,15 +424,21 @@ public String getProjectsReport(String viewId, String filter, String format) {
     
     
     
+    
 
-    private String getValue(String[] headers, String[] values, String columnName) {
-    for (int i = 0; i < headers.length; i++) {
-        if (headers[i].equalsIgnoreCase(columnName)) {
-            return i < values.length ? values[i].trim() : "";
+    private String getValue(String[] headers, String[] line, String key) {
+        for (int i = 0; i < headers.length; i++) {
+            if (headers[i].trim().equalsIgnoreCase(key)) {
+                if (i < line.length) {
+                    return line[i].trim();
+                } else {
+                    return "";
+                }
+            }
         }
+        return "";
     }
-        return ""; // Standardwert, falls die Spalte nicht gefunden wird
-        }
+
 
         private LocalDate parseDate(String dateStr) {
         if (dateStr == null || dateStr.isEmpty() || dateStr.equals("0")) {

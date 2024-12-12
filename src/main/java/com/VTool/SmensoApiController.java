@@ -168,6 +168,18 @@ public class SmensoApiController {
     public ResponseEntity<Map<String, String>> saveProjects(@RequestBody List<ProjectData> projects) {
         try {
             logger.info("Empfangene Projektdaten: {}", projects);
+            
+            // Temporär die ID-Überprüfung entfernen
+            /*
+            for (ProjectData project : projects) {
+                logger.debug("Projekt ID: '{}'", project.getId());
+                if (project.getId() == null || project.getId().isEmpty()) {
+                    logger.warn("Projekt ohne ID gefunden: {}", project);
+                    throw new IllegalArgumentException("Projekt-ID darf nicht leer sein.");
+                }
+            }
+            */
+            
             smensoApiService.saveProjectData(projects);
             return ResponseEntity.ok(Map.of("message", "Projekte erfolgreich gespeichert."));
         } catch (Exception e) {
@@ -176,6 +188,7 @@ public class SmensoApiController {
                                  .body(Map.of("error", "Fehler beim Speichern: " + e.getMessage()));
         }
     }
+    
 
 
 

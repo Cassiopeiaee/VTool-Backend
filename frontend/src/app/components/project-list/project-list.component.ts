@@ -6,14 +6,14 @@ import { CommonModule } from '@angular/common';
 
 // Schnittstelle für Projektdaten
 interface Project {
-  Title: string;
   Id: string;
+  Title: string;
   'Overall Status': string;
   Progress: number;
   Budget: string;
   'Start date': string;
   'End date': string;
-  // Weitere Felder können hier hinzugefügt werden
+  // Weitere Felder aus der CSV hinzufügen
 }
 
 @Component({
@@ -154,12 +154,7 @@ export class ProjectListComponent {
       const rowObject: any = {};
       headers.forEach((header, index) => {
         const key = header.trim();
-        let value = values[index]?.trim() || 'Nicht verfügbar';
-
-        // Budget bleibt als String
-        if (key === 'Budget') {
-          // Keine Konvertierung
-        }
+        let value = values[index]?.trim() || '';
 
         rowObject[key] = value;
       });
