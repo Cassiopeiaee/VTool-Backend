@@ -1,5 +1,7 @@
+// src/app/saved-project/saved-project.component.ts
+
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router'; 
 import { FormsModule } from '@angular/forms'; 
@@ -9,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-saved-projects',
   templateUrl: './saved-projects.component.html',
   styleUrls: ['./saved-projects.component.css'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule], // HttpClientModule hinzugefügt
 })
 export class SavedProjectsComponent implements OnInit {
   savedProjects: any[] = []; 
@@ -25,6 +27,7 @@ export class SavedProjectsComponent implements OnInit {
     this.http.get<any[]>(apiUrl).subscribe({
       next: (data) => {
         this.savedProjects = data;
+        console.log('Gespeicherte Projekte:', this.savedProjects); // Überprüfen Sie die Daten
       },
       error: (error) => {
         console.error('Fehler beim Abrufen der gespeicherten Projekte:', error);

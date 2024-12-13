@@ -1,28 +1,205 @@
+/* project-list.component.css */
+
+/* Allgemeine Tabellen-Stile */
 table {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
   font-size: 16px;
   text-align: left;
+  font-family: var(--font-sans);
+  background-color: transparent; /* Transparenter Hintergrund */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-table th,
-table td {
+/* Tabellenkopf (th) */
+table th {
+  background-color: var(--uv-blau-30); /* UV Blau 30: #1E90FF */
+  color: var(--weiss); /* Weißer Text für besseren Kontrast */
+  font-weight: 700;
+  font-family: var(--font-serif);
   padding: 12px 15px;
   border: 1px solid #ddd;
 }
 
-table th {
-  background-color: #f4f4f4;
+/* Tabellenkörper (td) */
+table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  color: var(--dunkelgrau); /* Dunkelgraue Textfarbe */
 }
 
-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+/* Abwechselnde Hintergrundfarben für Tabellenzeilen */
+table tbody tr:nth-child(odd) {
+  background-color: var(--weiss); /* Weiße Hintergrundfarbe */
 }
 
+table tbody tr:nth-child(even) {
+  background-color: var(--hellgrau); /* Graue Hintergrundfarbe */
+}
 
+/* Entfernen des Hover-Effekts für Tabellenzeilen */
+table tbody tr:hover {
+  background-color: inherit; /* Keine Änderung der Hintergrundfarbe */
+  color: inherit; /* Keine Änderung der Textfarbe */
+}
+
+/* Tabellen-Caption */
+table caption {
+  caption-side: top;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  font-family: var(--font-serif);
+  color: var(--uv-blau-30);
+}
+
+/* Button-Basisklassen */
 button {
-  margin-right: 5px;
-  padding: 5px 10px;
+  font-family: var(--font-sans);
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center; /* Zentriert den Text */
+  transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
+}
+
+/* Icon im Button */
+.button .button-icon {
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Primärer Button */
+.button-primary {
+  background-color: var(--uv-blau-30);
+  color: var(--weiss);
+}
+
+.button-primary:hover {
+  background-color: var(--uv-blau-20);
+}
+
+/* Sekundärer Button */
+.button-secondary {
+  background-color: var(--uv-gruen-30);
+  color: var(--weiss);
+}
+
+.button-secondary:hover {
+  background-color: var(--uv-gruen-20);
+}
+
+/* Standard-Button */
+.button-standard {
+  background-color: var(--hellgrau);
+  color: var(--dunkelgrau);
+  border: 1px solid var(--grau);
+}
+
+.button-standard:hover {
+  background-color: var(--grau);
+  color: var(--weiss);
+}
+
+/* Button-Varianten */
+.button-s {
+  padding: var(--btn-padding-s);
+  font-size: var(--btn-font-size-s);
+}
+
+.button-m {
+  padding: var(--btn-padding-m);
+  font-size: var(--btn-font-size-m);
+}
+
+.button-l {
+  padding: var(--btn-padding-l);
+  font-size: var(--btn-font-size-l);
+}
+
+/* Button-Gruppen */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1em;
+}
+
+/* Dialog */
+.dialog {
+  border: 1px solid var(--grau);
+  padding: 1em;
+  background-color: var(--hellgrau);
+  margin-top: 1em;
+  border-radius: 8px;
+}
+
+/* Keine gespeicherten Projekte */
+.no-projects {
+  text-align: center;
+  color: var(--grau);
+  margin-top: 1em;
+}
+
+/* Zusätzliche spezifische Stile für project-list.component.css */
+
+/* Zentrierter Container */
+.container {
+  padding: 20px;
+  max-width: 800px; /* Passe die maximale Breite nach Bedarf an */
+  margin: 0 auto;
+  background-color: var(--weiss); /* Weißer Hintergrund für den Inhalt */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Überschriften anpassen */
+h1 {
+  text-align: center;
+  margin-bottom: 40px; /* Erhöhter Abstand nach unten */
+}
+
+/* Optional: Stil für die zweite Überschrift */
+h1 + h1 {
+  margin-top: 40px; /* Abstand nach oben */
+}
+
+/* Anordnung der Checkboxen in Reihen von 4 */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Abstand zwischen den Checkboxen */
+}
+
+.checkbox-group label {
+  flex: 1 1 calc(25% - 10px); /* 4 Checkboxen pro Reihe */
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Für kleinere Bildschirme anpassen */
+@media (max-width: 800px) {
+  .checkbox-group label {
+      flex: 1 1 calc(50% - 10px); /* 2 Checkboxen pro Reihe */
+  }
+}
+
+@media (max-width: 500px) {
+  .checkbox-group label {
+      flex: 1 1 100%; /* 1 Checkbox pro Reihe */
+  }
+}
+
+/* Stil für das <hr>-Element */
+hr {
+  margin: 40px 0; 
+  border: none; 
+  height: 1px; 
+  background-color: #ccc; 
 }

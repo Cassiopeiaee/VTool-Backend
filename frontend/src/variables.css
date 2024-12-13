@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+/* src/variables.css */
+:root {
+    /* Primärfarbe */
+    --uv-blau-30: #1E90FF; /* UV Blau 30 */
+    --uv-blau-20: #63B3ED; /* UV Blau 20 (leichter Farbton für Hover) */
+
+    /* Sekundärfarben */
+    --uv-gruen-30: #32CD32; /* UV Grün 30 */
+    --uv-gruen-20: #66D9A6; /* UV Grün 20 (leichter Farbton für Hover) */
+
+    --tuerkis: #40E0D0;
+    --rot: #FF6347;
+    --orange: #FFA500;
+    --violett: #EE82EE;
+
+    /* Neutrale Farben */
+    --weiss: #FFFFFF;
+    --hellgrau: #F5F5F5;
+    --grau: #A9A9A9;
+    --dunkelgrau: #333333;
+
+    /* Schriftarten */
+    --font-sans: 'Source Sans Pro', sans-serif;
+    --font-serif: 'Source Serif Pro', serif;
+
+    /* Button-Größen */
+    --btn-padding-s: 5px 10px;
+    --btn-padding-m: 10px 20px;
+    --btn-padding-l: 15px 30px;
+
+    --btn-font-size-s: 12px;
+    --btn-font-size-m: 16px;
+    --btn-font-size-l: 20px;
+}

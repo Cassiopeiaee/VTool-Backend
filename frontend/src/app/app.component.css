@@ -1,21 +1,54 @@
-table {
-    border-collapse: collapse;
-    margin: 20px auto;
-    font-size: 1rem;
-    width: 80%;
+/* src/app/app.component.css */
+
+/* Header-Stile */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--weiss); /* Hintergrundfarbe des Headers */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo-Stile */
+.logo {
+  height: 50px; /* Höhe des Logos anpassen */
+  width: auto;
+}
+
+/* Navigationsleiste */
+.navbar {
+  margin-left: auto; /* Schiebt die Navigation nach rechts */
+}
+
+.navbar a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: var(--dunkelgrau);
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  color: var(--uv-blau-30); /* Farbe beim Hover */
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 600px) {
+  .logo {
+    height: 40px; /* Kleinere Höhe auf kleinen Bildschirmen */
   }
   
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  th {
-    background-color: #f4f4f4;
-    text-align: center;
+  .navbar {
+    margin-left: 0;
+    margin-top: 10px;
   }
   
-  td {
-    text-align: center;
+  .navbar a {
+    margin: 5px 0;
   }
-  
+}
+

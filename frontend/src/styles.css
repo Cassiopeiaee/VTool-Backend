@@ -1,1 +1,207 @@
-/* You can add global styles to this file, and also import other style files */
+/* Importiere die CSS-Variablen */
+@import 'variables.css';
+
+/* Allgemeine Stile */
+body {
+    font-family: var(--font-sans);
+    color: var(--dunkelgrau);
+    background-color: var(--hellgrau);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    color: var(--uv-blau-30);
+    margin: 0 0 10px 0;
+}
+
+p {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+}
+
+a {
+    color: var(--uv-blau-30);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: var(--uv-blau-20);
+}
+
+/* Zitate */
+.quote {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--dunkelgrau);
+    border-left: 4px solid var(--orange);
+    padding-left: 15px;
+    margin: 20px 0;
+}
+
+/* Formularelemente */
+.form-group {
+    margin-bottom: 1em;
+}
+
+.select-full-width,
+.input-full-width {
+    width: 100%;
+    max-width: 400px; 
+    padding: 10px;
+    border: 1px solid var(--grau);
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    box-sizing: border-box;
+    margin: 0 auto; 
+    display: block; 
+}
+
+@media (max-width: 600px) {
+    .input-full-width {
+        max-width: 100%;
+    }
+}
+
+.checkbox-group label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: 16px;
+}
+
+/* Button-Basisklassen */
+button {
+    font-family: var(--font-sans);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, color 0.3s;
+    text-decoration: none;
+}
+
+button .button-icon {
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Primärer Button */
+.button-primary {
+    background-color: var(--uv-blau-30);
+    color: var(--weiss);
+}
+
+.button-primary:hover {
+    background-color: var(--uv-blau-20);
+}
+
+/* Sekundärer Button */
+.button-secondary {
+    background-color: var(--uv-gruen-30);
+    color: var(--weiss);
+}
+
+.button-secondary:hover {
+    background-color: var(--uv-gruen-20);
+}
+
+/* Standard-Button */
+.button-standard {
+    background-color: var(--hellgrau);
+    color: var(--dunkelgrau);
+    border: 1px solid var(--grau);
+}
+
+.button-standard:hover {
+    background-color: var(--grau);
+    color: var(--weiss);
+}
+
+/* Button-Varianten */
+.button-s {
+    padding: var(--btn-padding-s);
+    font-size: var(--btn-font-size-s);
+}
+
+.button-m {
+    padding: var(--btn-padding-m);
+    font-size: var(--btn-font-size-m);
+}
+
+.button-l {
+    padding: var(--btn-padding-l);
+    font-size: var(--btn-font-size-l);
+}
+
+/* Button-Gruppen */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1em;
+}
+
+/* Dialog */
+.dialog {
+    border: 1px solid var(--grau);
+    padding: 1em;
+    background-color: var(--hellgrau);
+    margin-top: 1em;
+    border-radius: 8px;
+}
+
+/* Keine gespeicherten Projekte */
+.no-projects {
+    text-align: center;
+    color: var(--grau);
+    margin-top: 1em;
+}
+
+/* Tabellen-Stile */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    font-family: var(--font-sans);
+    background-color: var(--weiss);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: var(--hellgrau);
+    color: var(--dunkelgrau);
+    font-weight: 700;
+    font-family: var(--font-serif);
+}
+
+table tr:nth-child(even) {
+    background-color: var(--hellgrau);
+}
+
+table tr:hover {
+    background-color: var(--tuerkis);
+    color: var(--weiss);
+}
+
+table caption {
+    caption-side: top;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    font-family: var(--font-serif);
+    color: var(--uv-blau-30);
+}

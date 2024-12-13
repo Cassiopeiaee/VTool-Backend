@@ -1,41 +1,47 @@
-<div style="padding: 1em;">
-  <h1 style="text-align: center;">Gespeicherte Projekte</h1>
-
-  <!-- Tabelle zur Anzeige der gespeicherten Projekte -->
-  <table border="1" style="width: 100%; margin-top: 1em;" *ngIf="savedProjects.length">
-    <thead>
-      <tr>
-        <th>Titel</th>
-        <th>ID</th>
-        <th>Typ</th>
-        <th>Beschreibung</th>
-        <th>Status</th>
-        <th>Startdatum</th>
-        <th>Enddatum</th>
-        <th>Download Excel</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let project of savedProjects">
-        <td>{{ project.title }}</td>
-        <td>{{ project.id }}</td>
-        <td>{{ project.type }}</td>
-        <td>{{ project.description }}</td>
-        <td>{{ project.status }}</td>
-        <td>{{ project.startDate }}</td>
-        <td>{{ project.endDate }}</td>
-        <td>
-          <button (click)="downloadProjectAsExcel(project.id)">Download</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p *ngIf="!savedProjects.length" style="text-align: center;">
-    Keine gespeicherten Projekte verfügbar.
-  </p>
-
-  <div style="text-align: center; margin-top: 1em;">
-    <button (click)="goBackToMain()">Zurück</button>
+<div class="saved-project-container">
+    <h2 class="centered-heading">Gespeicherte Projekte</h2>
+  
+    <!-- Tabelle zur Anzeige der gespeicherten Projekte -->
+    <table *ngIf="savedProjects.length">
+        <caption>Liste der gespeicherten Projekte</caption>
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th>ID</th>
+                <th>Budget</th>
+                <th>Startdatum</th>
+                <th>Target Date</th>
+                <th>Enddatum</th>
+                <th>Project Manager</th>
+                <th>Download Excel</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let project of savedProjects">
+                <td>{{ project.title }}</td>
+                <td>{{ project.id }}</td>
+                <td>{{ project.budget }}</td>
+                <td>{{ project.startDate }}</td>
+                <td>{{ project.targetDate }}</td>
+                <td>{{ project.endDate }}</td>
+                <td>{{ project.projectManager }}</td>
+                <td>
+                    <button class="button button-primary button-s action-button" (click)="downloadProjectAsExcel(project.id)">
+                        <i class="fas fa-download button-icon"></i> Download
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  
+    <p *ngIf="!savedProjects.length" class="no-projects">
+        Keine gespeicherten Projekte verfügbar.
+    </p>
+  
+    <div class="button-group">
+        <button class="button button-secondary button-m" (click)="goBackToMain()">
+            <i class="fas fa-arrow-left button-icon"></i> Zurück
+        </button>
+    </div>
   </div>
-</div>
+  

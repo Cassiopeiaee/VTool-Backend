@@ -1,148 +1,170 @@
-<div style="padding: 1em; max-width: 700px; margin: auto;">
-  <h1 style="text-align: center;">Projekt aus Vorlage anlegen</h1>
+<div class="container">
+  <h1>Projekt Importieren</h1>
+
+  <div>
+      <div class="button-group">
+          <button class="button button-primary button-m" (click)="openDialog()">
+              <i class="fas fa-upload button-icon" aria-hidden="true"></i> Projekt abrufen
+          </button>
+          <button class="button button-secondary button-m" *ngIf="projects.length > 0" (click)="saveProjectToDatabase()">
+              <i class="fas fa-save button-icon" aria-hidden="true"></i> Projekt speichern
+          </button>
+          <button class="button button-standard button-m" (click)="viewSavedProjects()">
+              <i class="fas fa-eye button-icon" aria-hidden="true"></i> Gespeicherte Projekte
+          </button>
+      </div>
+
+      <!-- Dialog für View-ID Eingabe -->
+      <div *ngIf="dialogOpen" class="dialog">
+          <h3>Projekt-GUID eingeben</h3>
+          <input type="text" [(ngModel)]="viewId" placeholder="GUID eingeben" class="input-full-width">
+          <div class="button-group">
+              <button class="button button-primary button-s" (click)="fetchProject()">
+                  <i class="fas fa-check button-icon" aria-hidden="true"></i> Bestätigen
+              </button>
+              <button class="button button-standard button-s" (click)="closeDialog()">
+                  <i class="fas fa-times button-icon" aria-hidden="true"></i> Abbrechen
+              </button>
+          </div>
+      </div>
+
+      <!-- Tabelle zur Anzeige der Projekte -->
+      <table *ngIf="projects.length">
+          <caption>Liste der Projekte</caption>
+          <thead>
+              <tr>
+                  <th>Titel</th>
+                  <th>Id</th>
+                  <th>Overall Status</th> 
+                  <th>Progress</th>
+                  <th>Budget</th> 
+                  <th>Start Date</th>
+                  <th>End Date</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngFor="let project of projects">
+                  <td>{{ project.Title }}</td>
+                  <td>{{ project.Id }}</td>
+                  <td>{{ project['Overall Status'] }}</td>
+                  <td>{{ project.Progress }}%</td>
+                  <td>{{ project.Budget }}</td> 
+                  <td>{{ project['Start date'] }}</td>
+                  <td>{{ project['End date'] }}</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+
+  <hr>
+
+  <h1>Projekt aus Vorlage anlegen</h1>
 
   <!-- TemplateId Dropdown -->
-  <div style="margin-bottom: 1em;">
-    <label for="templateId"><strong>TemplateId (Pflicht)*:</strong></label><br>
-    <select id="templateId" [(ngModel)]="templateId" style="width: 100%;">
-      <option value="">--Bitte eine Vorlage auswählen--</option>
-      <option value="a0201cf6-f718-48a7-86a5-2e7fbbcf76f9">
-        Vorlage: Projekt & Portfolio Management
-      </option>
-      <option value="3783d542-ca26-47b3-ae2b-2edc65f88a42">
-        Vorlage: Agiles/Scrum-Projekt
-      </option>
-      <option value="3783d542-ca26-47b3-ae2b-2edc65f88a42">
-        Vorlage: IT-Projekt
-      </option>
-      <option value="3783d542-ca26-47b3-ae2b-2edc65f88a42">
-        Vorlage: Projektplanung klassisch
-      </option>
-    </select>
-    <small style="display:block; color: #666; margin-top:0.5em;">
-      Wählen Sie eine Vorlage aus der Dropdown-Liste aus. Jede Vorlage ist mit einer eindeutigen GUID verknüpft.
-    </small>
+  <div class="form-group">
+      <label for="templateId"><strong>TemplateId (Pflicht)*:</strong></label>
+      <select id="templateId" [(ngModel)]="templateId" class="select-full-width">
+          <option value="">--Bitte eine Vorlage auswählen--</option>
+          <option value="a0201cf6-f718-48a7-86a5-2e7fbbcf76f9">
+              Vorlage: Projekt & Portfolio Management
+          </option>
+          <option value="3783d542-ca26-47b3-ae2b-2edc65f88a42">
+              Vorlage: Agiles/Scrum-Projekt
+          </option>
+          <option value="3783d542-ca26-47b3-ae2b-2edc65f88a42">
+              Vorlage: IT-Projekt
+          </option>
+          <option value="3783d542-ca26-47b3-ae2b-2edc65f88a42">
+              Vorlage: Projektplanung klassisch
+          </option>
+      </select>
+      <small class="form-text">
+          Wählen Sie eine Vorlage aus der Dropdown-Liste aus. Jede Vorlage ist mit einer eindeutigen GUID verknüpft.
+      </small>
   </div>
 
   <!-- IsPrivate -->
-  <div style="margin-bottom: 1em;">
-    <label><input type="checkbox" [(ngModel)]="isPrivate"> IsPrivate</label>
+  <div class="form-group">
+      <label><input type="checkbox" [(ngModel)]="isPrivate"> IsPrivate</label>
   </div>
 
   <!-- StartDate -->
-  <div style="margin-bottom: 1em;">
-    <label for="startDate">StartDate:</label><br>
-    <input id="startDate" type="datetime-local" [(ngModel)]="startDate" style="width: 100%;">
+  <div class="form-group">
+      <label for="startDate">StartDate:</label>
+      <input id="startDate" type="datetime-local" [(ngModel)]="startDate" class="input-full-width">
   </div>
 
   <!-- StatusId -->
-  <div style="margin-bottom: 1em;">
-    <label for="statusId">StatusId (0=aktiv, 1=inaktiv):</label><br>
-    <input id="statusId" type="number" [(ngModel)]="statusId" style="width: 100%;">
+  <div class="form-group">
+      <label for="statusId">StatusId (0=aktiv, 1=inaktiv):</label>
+      <input id="statusId" type="number" [(ngModel)]="statusId" class="input-full-width">
   </div>
 
   <!-- Title (Pflicht) -->
-  <div style="margin-bottom: 1em;">
-    <label for="title"><strong>Title (Pflicht)*:</strong></label><br>
-    <input id="title" type="text" [(ngModel)]="title" placeholder="Titel" style="width: 100%;">
-    <small style="display:block; color: #666; margin-top:0.5em;">
-      Bitte geben Sie einen aussagekräftigen Projektnamen ein. Der Titel ist ein Pflichtfeld und beschreibt das Projekt.
-    </small>
+  <div class="form-group">
+      <label for="title"><strong>Title (Pflicht)*:</strong></label>
+      <input id="title" type="text" [(ngModel)]="title" placeholder="Titel" class="input-full-width">
+      <small class="form-text">
+          Bitte geben Sie einen aussagekräftigen Projektnamen ein. Der Titel ist ein Pflichtfeld und beschreibt das Projekt.
+      </small>
   </div>
 
   <!-- ProjectType (Pflicht) -->
-  <div style="margin-bottom: 1em;">
-    <label for="projectType"><strong>ProjectType (Pflicht)*:</strong></label><br>
-    <input id="projectType" type="text" [(ngModel)]="projectType" placeholder="Projekttyp" style="width: 100%;">
-    <small style="display:block; color: #666; margin-top:0.5em;">
-      Bitte den Namen des Projekttyps eingeben. Der eingegebene Name wird intern einer TypeId zugeordnet.
-      Nutzen Sie einen gültigen, im System bekannten Projekttyp-Namen.
-    </small>
+  <div class="form-group">
+      <label for="projectType"><strong>ProjectType (Pflicht)*:</strong></label>
+      <input id="projectType" type="text" [(ngModel)]="projectType" placeholder="Projekttyp" class="input-full-width">
+      <small class="form-text">
+          Bitte den Namen des Projekttyps eingeben. Der eingegebene Name wird intern einer TypeId zugeordnet.
+          Nutzen Sie einen gültigen, im System bekannten Projekttyp-Namen.
+      </small>
   </div>
 
   <!-- Folder (Pflicht) -->
-  <div style="margin-bottom: 1em;">
-    <label for="folder"><strong>Folder (Pflicht)*:</strong></label><br>
-    <input id="folder" type="text" [(ngModel)]="folder" placeholder="Projektordner" style="width: 100%;">
-    <small style="display:block; color: #666; margin-top:0.5em;">
-      Bitte den Namen des Projektordners eingeben. Der eingegebene Ordnername wird intern einer PhaseId zugeordnet.
-      Verwenden Sie einen Ordnernamen, der im System vorhanden ist.
-    </small>
+  <div class="form-group">
+      <label for="folder"><strong>Folder (Pflicht)*:</strong></label>
+      <input id="folder" type="text" [(ngModel)]="folder" placeholder="Projektordner" class="input-full-width">
+      <small class="form-text">
+          Bitte den Namen des Projektordners eingeben. Der eingegebene Ordnername wird intern einer PhaseId zugeordnet.
+          Verwenden Sie einen Ordnernamen, der im System vorhanden ist.
+      </small>
   </div>
 
   <!-- Code (optional) -->
-  <div style="margin-bottom: 1em;">
-    <label for="code">Code (optional):</label><br>
-    <input id="code" type="text" [(ngModel)]="code" placeholder="Projektcode" style="width: 100%;">
+  <div class="form-group">
+      <label for="code">Code (optional):</label>
+      <input id="code" type="text" [(ngModel)]="code" placeholder="Projektcode" class="input-full-width">
   </div>
 
   <h3>Optionale Einstellungen (Checkboxen für True/False):</h3>
-  <div><label><input type="checkbox" [(ngModel)]="adjustTaskDates"> AdjustTaskDates</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="tasks"> Tasks</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="flavors"> Flavors</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="labels"> Labels</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="manager"> Manager</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="tasksWorkflow"> TasksWorkflow</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="tasksTemplate"> TasksTemplate</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="folderTasksTemplate"> FolderTasksTemplate</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="viewSettings"> ViewSettings</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="budget"> Budget</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="location"> Location</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="description"> Description</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="hourlyRate"> HourlyRate</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="goal"> Goal</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="benefit"> Benefit</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="observers"> Observers</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="permissions"> Permissions</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="blockTimeRecording"> BlockTimeRecording</label></div>
-  <div><label><input type="checkbox" [(ngModel)]="markedColumns"> MarkedColumns</label></div>
-  <div style="margin-bottom:1em;"><label><input type="checkbox" [(ngModel)]="columnDescriptions"> ColumnDescriptions</label></div>
-
-  <div style="text-align: center; margin-top: 1em;">
-    <button (click)="createProjectFromTemplate()">Projekt aus Vorlage anlegen</button>
+  <div class="checkbox-group">
+      <label><input type="checkbox" [(ngModel)]="adjustTaskDates"> AdjustTaskDates</label>
+      <label><input type="checkbox" [(ngModel)]="tasks"> Tasks</label>
+      <label><input type="checkbox" [(ngModel)]="flavors"> Flavors</label>
+      <label><input type="checkbox" [(ngModel)]="labels"> Labels</label>
+      <label><input type="checkbox" [(ngModel)]="manager"> Manager</label>
+      <label><input type="checkbox" [(ngModel)]="tasksWorkflow"> TasksWorkflow</label>
+      <label><input type="checkbox" [(ngModel)]="tasksTemplate"> TasksTemplate</label>
+      <label><input type="checkbox" [(ngModel)]="folderTasksTemplate"> FolderTasksTemplate</label>
+      <label><input type="checkbox" [(ngModel)]="viewSettings"> ViewSettings</label>
+      <label><input type="checkbox" [(ngModel)]="budget"> Budget</label>
+      <label><input type="checkbox" [(ngModel)]="location"> Location</label>
+      <label><input type="checkbox" [(ngModel)]="description"> Description</label>
+      <label><input type="checkbox" [(ngModel)]="hourlyRate"> HourlyRate</label>
+      <label><input type="checkbox" [(ngModel)]="goal"> Goal</label>
+      <label><input type="checkbox" [(ngModel)]="benefit"> Benefit</label>
+      <label><input type="checkbox" [(ngModel)]="observers"> Observers</label>
+      <label><input type="checkbox" [(ngModel)]="permissions"> Permissions</label>
+      <label><input type="checkbox" [(ngModel)]="blockTimeRecording"> BlockTimeRecording</label>
+      <label><input type="checkbox" [(ngModel)]="markedColumns"> MarkedColumns</label>
+      <label><input type="checkbox" [(ngModel)]="columnDescriptions"> ColumnDescriptions</label>
   </div>
+
+  <div class="button-group">
+      <button class="button button-primary button-m" (click)="createProjectFromTemplate()">
+          <i class="fas fa-plus button-icon"></i> Projekt aus Vorlage anlegen
+      </button>
+  </div>
+
 </div>
 
-<hr style="margin:2em 0;">
-
-<div style="padding: 1em;">
-  <h1 style="text-align: center;">Projekt Importieren</h1>
-
-  <div style="text-align: center; margin-top: 1em;">
-    <button style="margin-right: 1em;" (click)="openDialog()">Projekt abrufen</button>
-    <button style="margin-right: 1em;" *ngIf="projects.length > 0" (click)="saveProjectToDatabase()">Projekt speichern</button>
-    <button (click)="viewSavedProjects()">Gespeicherte Projekte</button>
-  </div>
-
-  <div *ngIf="dialogOpen" style="border: 1px solid #ccc; padding: 1em; background-color: #f9f9f9; margin-top: 1em;">
-    <h3>Projekt-View-ID eingeben</h3>
-    <input type="text" [(ngModel)]="viewId" placeholder="View-ID eingeben" />
-    <button (click)="fetchProject()">Bestätigen</button>
-    <button (click)="closeDialog()">Abbrechen</button>
-  </div>
-
-  <table border="1" style="width: 100%; margin-top: 1em;" *ngIf="projects.length">
-    <thead>
-      <tr>
-        <th>Titel</th>
-        <th>Id</th>
-        <th>Overall Status</th> 
-        <th>Progress</th>
-        <th>Budget</th> 
-        <th>Start Date</th>
-        <th>End Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let project of projects">
-        <td>{{ project.Title }}</td>
-        <td>{{ project.Id }}</td>
-        <td>{{ project['Overall Status'] }}</td>
-        <td>{{ project.Progress }}</td>
-        <td>{{ project.Budget }}</td> 
-        <td>{{ project['Start date'] }}</td>
-        <td>{{ project['End date'] }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+<hr>
