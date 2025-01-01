@@ -1,14 +1,14 @@
 <!-- src/app/app.component.html -->
 
 <div class="header">
-  <!-- Logo im oberen linken Eck -->
-  <img src="assets/logo.jpg" alt="Firmenlogo" class="logo">
+  <!-- Logo-Container mit eingebettetem Base64-Bild -->
+  <div class="logo-container"></div>
   
   <!-- Navigationsleiste -->
   <nav class="navbar">
-    <a routerLink="/home">Home</a>
-    <a routerLink="/gespeicherte-projekte">Gespeicherte Projekte</a>
-    <!-- Fügen Sie weitere Links nach Bedarf hinzu -->
+    <a routerLink="/" routerLinkActive="active">Home</a>
+    <a routerLink="/gespeicherte-projekte" routerLinkActive="active">Gespeicherte Projekte</a>
+    <!-- Weitere Links nach Bedarf -->
   </nav>
 </div>
 

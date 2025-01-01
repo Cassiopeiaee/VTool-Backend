@@ -1,7 +1,50 @@
+<!-- src/app/saved-projects/saved-projects.component.html -->
+
 <div class="saved-project-container">
     <h2 class="centered-heading">Gespeicherte Projekte</h2>
   
-    <!-- Tabelle zur Anzeige der gespeicherten Projekte -->
+    <!-- Such- und Filterbereich -->
+    <div class="filter-search-container">
+      <!-- Suchleiste -->
+      <input
+        type="text"
+        placeholder="Projekte suchen..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="filterProjects()"
+        class="search-input"
+      />
+  
+      <!-- Filter-Dropdown -->
+      <select
+        [(ngModel)]="filterTerm"
+        (ngModelChange)="filterProjects()"
+        class="filter-select"
+      >
+        <option value="">Alle Projekte</option>
+        <option *ngFor="let name of projectNames" [value]="name">{{ name }}</option>
+      </select>
+    </div>
+  
+    <!-- Gefilterte Projektliste -->
+    <div *ngIf="filteredProjects.length" class="filtered-projects-list">
+      <h3>Gefilterte Projekte</h3>
+      <ul>
+        <li *ngFor="let project of filteredProjects">
+          <strong>Titel:</strong> {{ project.title }}<br>
+          <strong>Startdatum:</strong> {{ project.startDate | date:'dd.MM.yyyy' }}<br>
+          <strong>Enddatum:</strong> {{ project.endDate | date:'dd.MM.yyyy' }}<br>
+          <a href="#{{ project.id }}" (click)="navigateToProject(project.id)" class="link-button">
+            <i class="fas fa-link"></i> Zum Projekt
+          </a>
+        </li>
+      </ul>
+    </div>
+  
+    <p *ngIf="!filteredProjects.length && (searchTerm || filterTerm)" class="no-projects">
+        Keine Projekte gefunden für die Such- und Filterkriterien.
+    </p>
+  
+    <!-- Bestehende Tabelle zur Anzeige aller Projekte -->
     <table *ngIf="savedProjects.length">
         <caption>Liste der gespeicherten Projekte</caption>
         <thead>
@@ -17,13 +60,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let project of savedProjects">
+            <tr *ngFor="let project of savedProjects" [id]="project.id">
                 <td>{{ project.title }}</td>
                 <td>{{ project.id }}</td>
                 <td>{{ project.budget }}</td>
-                <td>{{ project.startDate }}</td>
-                <td>{{ project.targetDate }}</td>
-                <td>{{ project.endDate }}</td>
+                <td>{{ project.startDate | date:'dd.MM.yyyy' }}</td>
+                <td>{{ project.targetDate | date:'dd.MM.yyyy' }}</td>
+                <td>{{ project.endDate | date:'dd.MM.yyyy' }}</td>
                 <td>{{ project.projectManager }}</td>
                 <td>
                     <button class="button button-primary button-s action-button" (click)="downloadProjectAsExcel(project.id)">
