@@ -1,17 +1,11 @@
 package com.VTool;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -45,33 +39,25 @@ public class SmensoApiService {
     }
 
 
-    public void saveProjects(List<ProjectData> projectDataList) {
-        projectDataRepository.saveAll(projectDataList);
-    }
-
-
-
-
-
     public String fetchProjectReport(String guid, String filter, String format) {
-        String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid 
+        String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid
                         + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=" + filter + "&format=" + format;
-    
+
         logger.info("API URL: {}", apiUrl);
-    
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
         headers.set("Accept", "text/csv");
-    
+
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    
+
         try {
             // API-Antwort als byte[] abrufen, um Dekodierungsprobleme zu umgehen
             ResponseEntity<byte[]> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, byte[].class);
-    
+
             logger.info("Response Status: {}", response.getStatusCode());
             logger.info("Response Headers: {}", response.getHeaders());
-    
+
             if (response.getStatusCode() == HttpStatus.OK) {
                 try {
                     // CSV-Daten dekodieren
@@ -92,8 +78,7 @@ public class SmensoApiService {
     }
 
 
-
-        public byte[] generateExcelForProject(ProjectData project, String id) throws IOException {
+    public byte[] generateExcelForProject(ProjectData project, String id) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Project Data");
 
@@ -174,93 +159,13 @@ public class SmensoApiService {
         return bos.toByteArray();
     }
 
-    
-
-
-
-    public String createProject(String xmlPayload) {
-        try {
-            
-            String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Integration/project";
-
-            // Header konfigurieren
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
-            headers.setContentType(MediaType.APPLICATION_XML);
-
-            // Anfrage erstellen
-            HttpEntity<String> requestEntity = new HttpEntity<>(xmlPayload, headers);
-
-            // API-Aufruf
-            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
-
-            return response.getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Erstellen des Projekts: " + e.getMessage(), e);
-        }
-    }
-
-
-    public List<Map<String, String>> getProjectsReportAsJson(String csvData) {
-        try (BufferedReader reader = new BufferedReader(new StringReader(csvData))) {
-            String headerLine = reader.readLine(); // Erste Zeile enthält Header
-
-            if (headerLine == null || headerLine.isEmpty()) {
-                throw new RuntimeException("CSV-Daten enthalten keine Header");
-            }
-
-            String[] headers = headerLine.split(","); // Header in Felder aufteilen
-            List<Map<String, String>> jsonData = new ArrayList<>();
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",", -1); // Datenzeile in Felder aufteilen
-                Map<String, String> row = new HashMap<>();
-
-                for (int i = 0; i < headers.length; i++) {
-                    row.put(headers[i].trim(), i < values.length ? values[i].trim() : ""); // Fehlende Werte behandeln
-                }
-                jsonData.add(row);
-            }
-
-            return jsonData;
-        } catch (Exception e) {
-            throw new RuntimeException("Fehler beim Verarbeiten der CSV-Daten", e);
-        }
-    }
-
-
-    public String fetchSingleProject(String guid) {
-        String url = "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects/" + guid
-                + "?view=e813c779-f5ed-4fce-91ca-1ec9f67b0262&filter=active&format=CSV";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
-        headers.set("Accept", "text/csv");
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                requestEntity,
-                String.class
-        );
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Fehler beim Abrufen des Projekts: " + response.getStatusCode());
-        }
-    }
-
 
     public String createProjectFromTemplate(String templateId, String xmlPayload) {
         try {
             String apiUrl = "https://bgn-it.smenso.cloud/skyisland/api/Integration/template/project/create/" + templateId;
 
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl"); 
+            headers.set("Authorization", "Basic N2E4NzU5YjItY2NlMC00MTQzLWIzMmYtM2Q4ZTljNzdkY2UxOk1ab0loNDJLQ01yR1VLVmNBSGN3ZHNHWXJkUnU1cGhl");
             headers.setContentType(MediaType.APPLICATION_XML);
             headers.setAccept(List.of(MediaType.APPLICATION_XML));
 
@@ -274,31 +179,22 @@ public class SmensoApiService {
             throw new RuntimeException("Fehler beim Erstellen des Projekts aus der Vorlage: " + e.getMessage(), e);
         }
     }
-    
-    
 
 
-
-public String getProjectsReport(String viewId, String filter, String format) {
+    public String getProjectsReport(String viewId, String filter, String format) {
         try {
-            
             String apiUrl = String.format(
                 "https://bgn-it.smenso.cloud/skyisland/api/Reports/projects?view=%s&filter=%s&format=%s",
                 viewId, filter, format
             );
 
-            // Header konfigurieren
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Basic NjA0ZGY5NWEtNjNmZi00YTU3LWJjYTUtNGYxMDlkZjEwN2Y1OnlYaG1PR1M0VjQwZ0FzV1VBYlJvU2h0SXMxRW41Q255");
-            headers.setAccept(List.of(MediaType.TEXT_PLAIN)); 
+            headers.setAccept(List.of(MediaType.TEXT_PLAIN));
 
-            // Anfrage erstellen
             HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-            // API-Aufruf
             ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, String.class);
-
-            
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Client-Fehler: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
@@ -310,47 +206,34 @@ public String getProjectsReport(String viewId, String filter, String format) {
     }
 
 
-
-
-
-
     @Transactional
     public void saveProjectData(List<ProjectData> projectDataList) {
         projectDataRepository.saveAll(projectDataList);
     }
 
-    public void saveCsvDataToDatabase(String csvData) {
-        List<ProjectData> projectDataList = parseCsvToProjectData(csvData);
-        projectDataRepository.saveAll(projectDataList);
-    }
-
-
-
-
     public List<ProjectData> parseCsvToProjectData(String csvData) {
         List<ProjectData> projects = new ArrayList<>();
-        try {
-            // OpenCSV-Parser erstellen
-            CSVReader reader = new CSVReader(new StringReader(csvData));
+        try (CSVReader reader = new CSVReader(new StringReader(csvData))) {
+
             String[] headers = reader.readNext(); // Header-Zeile lesen
-    
             if (headers == null) {
                 throw new RuntimeException("Die CSV-Daten enthalten keine Header-Zeile.");
             }
-    
+
             String[] line;
             while ((line = reader.readNext()) != null) {
                 // Überspringen von leeren Zeilen
                 if (line.length == 0 || line[0].trim().isEmpty()) {
                     continue;
                 }
-    
+
                 ProjectData project = new ProjectData();
-    
+
                 // Mapping der bereits existierenden Felder
                 project.setId(getValue(headers, line, "Id"));
                 project.setTitle(getValue(headers, line, "Title"));
                 project.setStatus(getValue(headers, line, "Status"));
+
                 try {
                     String progressStr = getValue(headers, line, "Progress").replace("%", "").trim();
                     project.setProgress(Integer.parseInt(progressStr));
@@ -358,22 +241,22 @@ public String getProjectsReport(String viewId, String filter, String format) {
                     System.err.println("Ungültiger Progress-Wert: " + getValue(headers, line, "Progress"));
                     project.setProgress(0); // Standardwert setzen
                 }
-    
+
                 project.setCostStatus(getValue(headers, line, "Cost Status"));
-    
+
                 // Setze Budget als String
                 String budgetStr = getValue(headers, line, "Budget");
                 project.setBudget(budgetStr != null && !budgetStr.isEmpty() ? budgetStr : "0");
-    
+
                 // Setze Overall Status als String
                 project.setOverallStatus(getValue(headers, line, "Overall Status"));
-    
+
                 String startDate = getValue(headers, line, "Start date");
-                String endDate = getValue(headers, line, "End date");
-    
+                String endDate   = getValue(headers, line, "End date");
+
                 project.setStartDate((startDate == null || startDate.isEmpty()) ? "Nicht verfügbar" : startDate);
                 project.setEndDate((endDate == null || endDate.isEmpty()) ? "Nicht verfügbar" : endDate);
-    
+
                 // Weitere Felder setzen...
                 project.setCode(getValue(headers, line, "Code"));
                 project.setType(getValue(headers, line, "Type"));
@@ -411,7 +294,7 @@ public String getProjectsReport(String viewId, String filter, String format) {
                 project.setUpdatedBy(getValue(headers, line, "Updated By"));
                 project.setLabels(getValue(headers, line, "Labels"));
                 project.setLockedFlavors(getValue(headers, line, "LockedFlavors"));
-    
+
                 System.out.println("Geparstes Projekt: " + project);
                 projects.add(project);
             }
@@ -420,11 +303,6 @@ public String getProjectsReport(String viewId, String filter, String format) {
         }
         return projects;
     }
-    
-    
-    
-    
-    
 
     private String getValue(String[] headers, String[] line, String key) {
         for (int i = 0; i < headers.length; i++) {
@@ -438,19 +316,4 @@ public String getProjectsReport(String viewId, String filter, String format) {
         }
         return "";
     }
-
-
-        private LocalDate parseDate(String dateStr) {
-        if (dateStr == null || dateStr.isEmpty() || dateStr.equals("0")) {
-            return null; // Ungültige Werte werden ignoriert
-        }
-
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            return LocalDate.parse(dateStr, formatter);
-        } catch (DateTimeParseException e) {
-            throw new RuntimeException("Ungültiges Datumsformat: " + dateStr, e);
-        }
-    }
-
 }

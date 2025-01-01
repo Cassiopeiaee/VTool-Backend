@@ -129,15 +129,6 @@ public class SmensoApiController {
                     .body("<error>Fehler beim Erstellen des Projekts: " + e.getMessage() + "</error>");
         }
     }
-    
-
-    
-    
-
-    @PostMapping(value = "/project", consumes = "application/xml", produces = "application/xml")
-    public String createProject(@RequestBody String xmlPayload) {
-        return smensoApiService.createProject(xmlPayload);
-    }
 
 
     @GetMapping(value = "/projects/report", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -189,12 +180,4 @@ public class SmensoApiController {
         }
     }
     
-
-
-
-
-    @GetMapping("/api/saved-projects")
-    public List<ProjectData> getSavedProjects() {
-        return projectDataRepository.findAll(); // Alle gespeicherten Projekte abrufen
-    }
 }
