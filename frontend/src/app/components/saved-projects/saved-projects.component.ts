@@ -1,10 +1,11 @@
-// src/app/saved-projects/saved-projects.component.ts
+// src/app/components/saved-projects/saved-projects.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router'; 
 import { FormsModule } from '@angular/forms'; 
+import { ProjectData } from '../../models/project-data.model'; // Korrigierter Importpfad
 
 @Component({
   standalone: true,
@@ -14,8 +15,8 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
 })
 export class SavedProjectsComponent implements OnInit {
-  savedProjects: any[] = []; 
-  filteredProjects: any[] = [];
+  savedProjects: ProjectData[] = []; 
+  filteredProjects: ProjectData[] = [];
   searchTerm: string = '';
   filterTerm: string = '';
   projectNames: string[] = []; // Liste der einzigartigen Projektnamen für das Filter-Dropdown
@@ -31,7 +32,7 @@ export class SavedProjectsComponent implements OnInit {
    */
   fetchSavedProjects(): void {
     const apiUrl = 'http://localhost:8080/smenso/api/saved-projects'; 
-    this.http.get<any[]>(apiUrl).subscribe({
+    this.http.get<ProjectData[]>(apiUrl).subscribe({
       next: (data) => {
         this.savedProjects = data;
         console.log('Gespeicherte Projekte:', this.savedProjects);
@@ -95,5 +96,9 @@ export class SavedProjectsComponent implements OnInit {
         alert('Fehler beim Herunterladen der Datei.');
       }
     });
+  }
+  isValidDate(dateStr: string): boolean {
+    const date = new Date(dateStr);
+    return !isNaN(date.getTime());
   }
 }

@@ -1,5 +1,6 @@
 package com.VTool;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,42 +42,58 @@ public class SmensoApiController {
     }
 
 
+    @GetMapping("/api/saved-projects")
+    public ResponseEntity<List<ProjectData>> getSavedProjects() {
+        try {
+            List<ProjectData> projects = projectDataRepository.findAll();
+            logger.info("Anzahl der abgerufenen Projekte: {}", projects.size());
+            return ResponseEntity.ok(projects);
+        } catch (Exception e) {
+            logger.error("Fehler beim Abrufen der gespeicherten Projekte", e);
+            // Optional: detailliertere Fehlerantwort
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
     @GetMapping("/report/{guid}")
     public ResponseEntity<String> fetchAndSaveProject(@PathVariable String guid) {
         System.out.println("Erhaltene View-ID: " + guid);
     
         try {
-            // Abrufen des CSV-Datensatzes
+            // 1) CSV-Daten aus Smenso abrufen
             String csvData = smensoApiService.fetchProjectReport(guid, "active", "CSV");
             System.out.println("Erhaltene CSV-Daten:\n" + csvData);
     
-            // Konvertierung von CSV zu Projektdaten
+            // 2) CSV in eine Liste von ProjectData-Objekten umwandeln
             List<ProjectData> projects = smensoApiService.parseCsvToProjectData(csvData);
     
-            // Alle vorherigen Projekte löschen
-            projectDataRepository.deleteAll();
-    
-            // Nur das aktuelle Projekt speichern und zurückgeben
+            // 3) Alle Projekte aus der CSV speichern
             if (!projects.isEmpty()) {
-                ProjectData currentProject = projects.get(0); // Nehmen wir das erste Projekt
-                projectDataRepository.save(currentProject);
+                projectDataRepository.saveAll(projects);
     
-                // Erstelle die CSV-Antwort mit zusätzlichen Feldern
-                String csvResponse = String.format(
-                    "Id,Title,Status,Progress,Cost Status,Start date,End date,Overall Status,Budget\n" +
-                    "%s,%s,%s,%d,%s,%s,%s,%s,%s\n",
-                    currentProject.getId(),
-                    currentProject.getTitle(),
-                    currentProject.getStatus(),
-                    currentProject.getProgress(),
-                    currentProject.getCostStatus(),
-                    currentProject.getStartDate(),
-                    currentProject.getEndDate(),
-                    currentProject.getOverallStatus() != null ? currentProject.getOverallStatus() : "",
-                    currentProject.getBudget() != null ? currentProject.getBudget() : "0"
-                );
+                // 4) Optionale CSV-Antwort mit allen Projekten erstellen
+                StringBuilder csvResponseBuilder = new StringBuilder();
+                csvResponseBuilder.append("Id,Title,Status,Progress,Cost Status,Start date,End date,Overall Status,Budget\n");
     
-                return ResponseEntity.ok(csvResponse);
+                for (ProjectData currentProject : projects) {
+                    csvResponseBuilder.append(String.format(
+                        "%s,%s,%s,%d,%s,%s,%s,%s,%s\n",
+                        currentProject.getId(),
+                        currentProject.getTitle(),
+                        currentProject.getStatus(),
+                        currentProject.getProgress(),
+                        currentProject.getCostStatus(),
+                        currentProject.getStartDate(),
+                        currentProject.getEndDate(),
+                        currentProject.getOverallStatus() != null ? currentProject.getOverallStatus() : "",
+                        currentProject.getBudget() != null ? currentProject.getBudget() : "0"
+                    ));
+                }
+    
+                // 5) Rückgabe der CSV-Antwort (alle Projekte)
+                return ResponseEntity.ok(csvResponseBuilder.toString());
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                      .body("Kein Projekt gefunden.");
@@ -87,6 +104,7 @@ public class SmensoApiController {
                                  .body("Fehler beim Speichern des Projekts: " + e.getMessage());
         }
     }
+    
     
     
     
@@ -157,27 +175,14 @@ public class SmensoApiController {
     private static final Logger logger = LoggerFactory.getLogger(SmensoApiController.class);
     @PostMapping("/save-project")
     public ResponseEntity<Map<String, String>> saveProjects(@RequestBody List<ProjectData> projects) {
+        Map<String, String> response = new HashMap<>();
         try {
-            logger.info("Empfangene Projektdaten: {}", projects);
-            
-            // Temporär die ID-Überprüfung entfernen
-            /*
-            for (ProjectData project : projects) {
-                logger.debug("Projekt ID: '{}'", project.getId());
-                if (project.getId() == null || project.getId().isEmpty()) {
-                    logger.warn("Projekt ohne ID gefunden: {}", project);
-                    throw new IllegalArgumentException("Projekt-ID darf nicht leer sein.");
-                }
-            }
-            */
-            
-            smensoApiService.saveProjectData(projects);
-            return ResponseEntity.ok(Map.of("message", "Projekte erfolgreich gespeichert."));
+            projectDataRepository.saveAll(projects);
+            response.put("message", "Projekte wurden erfolgreich gespeichert.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Fehler beim Speichern der Projekte", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(Map.of("error", "Fehler beim Speichern: " + e.getMessage()));
+            response.put("error", "Fehler beim Speichern der Projekte: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
-    
 }
